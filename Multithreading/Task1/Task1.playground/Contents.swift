@@ -68,7 +68,7 @@ class GeneratingThread: Thread {
     }
     
     override func main() {
-        let timer = Timer(timeInterval: 2, repeats: true) { _ in
+        let timer = Timer(timeInterval: 2, repeats: true) { [unowned self] _ in
             self.breadStorage.push(Bread.make())
         }
         
