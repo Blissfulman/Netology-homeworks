@@ -60,53 +60,54 @@ class ViewController: UIViewController {
     private func start() {
         
         let startTime = Date()
-        var foundPassword: String?
+        var isFound = false
         let queue = OperationQueue()
         let errorFindOperation = Operation()
         
         queue.maxConcurrentOperationCount = 7
         
-        // Цикл создания операций, каждая из которых будет искать в диапазоне между соседними черырьмя одинаковыми символами (например между "aaaa" и "bbbb")
+        // Цикл создания операций, каждая из которых будет искать в диапазоне между соседними черырьмя одинаковыми символами (например между "0000" и "1111" или "cccc" и "dddd")
         for item in 0...Consts.characterArray.count - 2 {
             print("New find operation", item)
             let startChar = Consts.characterArray[item]
-            let startString = String(startChar + startChar + startChar + startChar)
+            let startString = startChar + startChar + startChar + startChar
             let endChar = Consts.characterArray[item + 1]
-            let endString = String(endChar + endChar + endChar + endChar)
+            let endString = endChar + endChar + endChar + endChar
             
-            let operation = BruteForceOperation(inputPassword: password, startString: startString, endString: endString)
+            let passwordFindOperation = BruteForceOperation(inputPassword: password, startString: startString, endString: endString)
             
             // Для того, чтобы операция оповещения об ошибке поиска могла запуститься только после окончания всех операций поиска, добавляется зависимость
-            errorFindOperation.addDependency(operation)
+            errorFindOperation.addDependency(passwordFindOperation)
             
             // Проверка нахождения пароля и вывод информации, если пароль был найден
-            operation.completionBlock = {
-                if let password = operation.foundResult {
+            passwordFindOperation.completionBlock = {
+                if let foundPassword = passwordFindOperation.foundResult {
                     DispatchQueue.main.async {
+                        queue.cancelAllOperations()
                         print("Password found")
-                        foundPassword = password
-                        self.stop(password: password, startTime: startTime)
+                        if !isFound {
+                            self.stop(password: foundPassword, startTime: startTime)
+                        }
+                        isFound = true
                     }
-                    queue.cancelAllOperations()
                 }
             }
-            queue.addOperation(operation)
+            queue.addOperation(passwordFindOperation)
         }
         
         // Если пароль не был найден сообщается об ошибке поиска
         errorFindOperation.completionBlock = {
-            if foundPassword == nil {
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                if !isFound {
                     print("Password not found")
                     self.stop(password: "Error", startTime: startTime)
                 }
             }
         }
-        
         queue.addOperation(errorFindOperation)
     }
     
-    //Обновляем UI
+    // Обновляем UI
     private func stop(password: String, startTime: Date) {
         indicator.stopAnimating()
         indicator.isHidden = true
@@ -166,74 +167,5 @@ extension ViewController: UITextFieldDelegate {
         let newString = NSString(string: text).replacingCharacters(in: range, with: string)
         let filtered = newString.rangeOfCharacter(from: characterSet) == nil
         return newString.count <= maxTextLength && filtered
-    }
-}
-
-/// Операция поиска пароля (если пароль найден, он присваивается переменной foundResult, иначе она остаётся равной nil)
-class BruteForceOperation: Operation {
-    
-    let inputPassword: String
-    var foundResult: String?
-    let startString: String
-    let endString: String
-    var startIndexArray = [Int]()
-    var endIndexArray = [Int]()
-    let characterArray = Consts.characterArray
-    let maxIndexArray = Consts.characterArray.count
-    
-    init(inputPassword: String, startString: String, endString: String) {
-        self.inputPassword = inputPassword
-        self.startString = startString
-        self.endString = endString
-        super.init()
-    }
-    
-    override func main() {
-        
-        print("Operation started")
-        
-        // Создает массивы индексов из входных строк
-        for char in startString {
-            for (index, value) in characterArray.enumerated() where value == "\(char)" {
-                startIndexArray.append(index)
-            }
-        }
-        for char in endString {
-            for (index, value) in characterArray.enumerated() where value == "\(char)" {
-                endIndexArray.append(index)
-            }
-        }
-        
-        var currentIndexArray = startIndexArray
-        
-        // Цикл подбора пароля
-        while true {
-            
-            // Формируем строку проверки пароля из элементов массива символов
-            let currentPass = self.characterArray[currentIndexArray[0]] + self.characterArray[currentIndexArray[1]] + self.characterArray[currentIndexArray[2]] + self.characterArray[currentIndexArray[3]]
-            
-            // Выходим из цикла если пароль найден, или, если дошли до конца массива индексов
-            if inputPassword == currentPass {
-                print("Password found:", currentPass)
-                foundResult = currentPass
-                break
-            } else {
-                if currentIndexArray.elementsEqual(endIndexArray) {
-                    break
-                }
-                
-                // Если пароль не найден, то происходит увеличение индекса. Для этого в цикле, начиная с последнего элемента осуществляется проверка текущего значения. Если оно меньше максимального значения (61), то индекс просто увеличивается на 1.
-                //Например было [0, 0, 0, 5] а станет [0, 0, 0, 6]. Если же мы уже проверили последний индекс, например [0, 0, 0, 61], то нужно сбросить его в 0, а "старший" индекс увеличить на 1. При этом далее в цикле проверяется переполение "старшего" индекса тем же алгоритмом.
-                //Таким образом [0, 0, 0, 61] станет [0, 0, 1, 0]. И поиск продолжится дальше:  [0, 0, 1, 1],  [0, 0, 1, 2],  [0, 0, 1, 3] и т.д.
-                for index in (0 ..< currentIndexArray.count).reversed() {
-                    guard currentIndexArray[index] < maxIndexArray - 1 else {
-                        currentIndexArray[index] = 0
-                        continue
-                    }
-                    currentIndexArray[index] += 1
-                    break
-                }
-            }
-        }
     }
 }
