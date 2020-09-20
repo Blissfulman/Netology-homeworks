@@ -58,26 +58,25 @@ class ViewController: UIViewController {
     }
     
     private func start() {
-        
+
         let startTime = Date()
         var isFound = false
-        let queue = OperationQueue()
         let errorFindOperation = Operation()
+        let queue = OperationQueue()
+        var startEndStrings = [String]()
         
         queue.maxConcurrentOperationCount = 7
         
+        // Формирование массива строк для дальнейшей передачи их в инициализатор класса BruteForceOperation
+        for item in Consts.characterArray {
+            startEndStrings.append("\(item)\(item)\(item)\(item)")
+        }
+        
         // Цикл создания операций, каждая из которых будет искать в диапазоне между соседними черырьмя одинаковыми символами (например между "0000" и "1111" или "cccc" и "dddd")
-        for item in 0...Consts.characterArray.count - 2 {
+        for item in 0...startEndStrings.count - 2 {
             print("New find operation", item)
-            let startChar = Consts.characterArray[item]
-            let startString = startChar + startChar + startChar + startChar
-            let endChar = Consts.characterArray[item + 1]
-            let endString = endChar + endChar + endChar + endChar
             
-            let passwordFindOperation = BruteForceOperation(inputPassword: password, startString: startString, endString: endString)
-            
-            // Для того, чтобы операция оповещения об ошибке поиска могла запуститься только после окончания всех операций поиска, добавляется зависимость
-            errorFindOperation.addDependency(passwordFindOperation)
+            let passwordFindOperation = BruteForceOperation(inputPassword: password, startString: startEndStrings[item], endString: startEndStrings[item + 1])
             
             // Проверка нахождения пароля и вывод информации, если пароль был найден
             passwordFindOperation.completionBlock = {
@@ -97,6 +96,7 @@ class ViewController: UIViewController {
         
         // Если пароль не был найден сообщается об ошибке поиска
         errorFindOperation.completionBlock = {
+            queue.waitUntilAllOperationsAreFinished()
             DispatchQueue.main.async {
                 if !isFound {
                     print("Password not found")

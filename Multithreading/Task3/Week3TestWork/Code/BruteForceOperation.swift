@@ -26,7 +26,7 @@ class BruteForceOperation: Operation {
         self.endString = endString
         super.init()
     }
-    
+
     override func main() {
         
         print("Operation started")
