@@ -46,7 +46,7 @@ class BruteForceOperation: Operation {
         var currentIndexArray = startIndexArray
         
         // Цикл подбора пароля
-        while true {
+        while !isCancelled {
             
             // Формируем строку проверки пароля из элементов массива символов
             let currentPass = self.characterArray[currentIndexArray[0]] + self.characterArray[currentIndexArray[1]] + self.characterArray[currentIndexArray[2]] + self.characterArray[currentIndexArray[3]]

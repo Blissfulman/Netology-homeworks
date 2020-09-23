@@ -74,7 +74,6 @@ class ViewController: UIViewController {
         
         // Цикл создания операций, каждая из которых будет искать в диапазоне между соседними черырьмя одинаковыми символами (например между "0000" и "1111" или "cccc" и "dddd")
         for item in 0...startEndStrings.count - 2 {
-            print("New find operation", item)
             
             let passwordFindOperation = BruteForceOperation(inputPassword: password, startString: startEndStrings[item], endString: startEndStrings[item + 1])
             
@@ -82,12 +81,10 @@ class ViewController: UIViewController {
             passwordFindOperation.completionBlock = {
                 if let foundPassword = passwordFindOperation.foundResult {
                     DispatchQueue.main.async {
+                        isFound = true
                         queue.cancelAllOperations()
                         print("Password found")
-                        if !isFound {
-                            self.stop(password: foundPassword, startTime: startTime)
-                        }
-                        isFound = true
+                        self.stop(password: foundPassword, startTime: startTime)
                     }
                 }
             }
