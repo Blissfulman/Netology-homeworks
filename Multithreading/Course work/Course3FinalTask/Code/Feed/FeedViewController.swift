@@ -14,17 +14,34 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     // MARK: - Свойства
     /// Массив постов ленты
-    private lazy var feedPosts = DataProviders.shared.postsDataProvider.feed()
+    private var feedPosts: [Post]!
     
     @IBOutlet weak var feedTableView: UITableView!
-    
+        
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        getFeedPosts()
+
+        sleep(2)
+        
         feedTableView.dataSource = self
         feedTableView.delegate = self
         feedTableView.separatorStyle = .none
+    }
+    
+    // MARK: - Методы получения данных
+    /// Возвращает публикации пользователей на которых подписан текущий пользователь
+    private func getFeedPosts() {
+        let _ = DataProviders.shared.postsDataProvider.feed(queue: DispatchQueue.global(qos: .utility)) {
+            (feedPosts) in
+            guard let feedPosts = feedPosts else {
+                print("Feed posts were not recieved")
+                return
+            }
+            self.feedPosts = feedPosts
+        }
     }
     
     // MARK: - CollectionViewDataSource
@@ -34,7 +51,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "postCell", for: indexPath) as! FeedTableViewCell
-        cell.fillingCell(feedPosts[indexPath.row])
+        cell.fillingCell(feedPosts![indexPath.row])
         cell.delegate = self
         return cell
     }
@@ -59,6 +76,6 @@ extension FeedViewController: FeedTableViewCellDelegate {
     
     /// Обновление данных массива постов ленты
     func updateFeedData() {
-        feedPosts = DataProviders.shared.postsDataProvider.feed()
+        getFeedPosts()
     }
 }

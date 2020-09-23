@@ -37,6 +37,47 @@ class FeedTableViewCell: UITableViewCell {
         setGestureRecognizers()
     }
     
+    // MARK: - Методы получения данных
+    /// Возвращает публикацию с переданным ID.
+    private func getPost(postID: Post.Identifier) -> Post? {
+        var gettingPost: Post?
+        let _ = DataProviders.shared.postsDataProvider.post(with: postID, queue: DispatchQueue.main) {
+            (post) in
+//            DispatchQueue.main.async {
+            print(post)
+            gettingPost = post
+//            }
+        }
+//        sleep(2)
+        return gettingPost
+    }
+    
+    /// Возвращает пользователя с переданным ID.
+    private func getUser(userID: User.Identifier) -> User? {
+        var gettingUser: User?
+        let _ = DataProviders.shared.usersDataProvider.user(with: userID, queue: DispatchQueue.main) {
+            (user) in
+            DispatchQueue.main.async {
+                gettingUser = user
+//                return user
+            }
+        }
+        return gettingUser
+    }
+    
+    /// Возвращает пользователей поставивших лайк на публикацию.
+    private func getUsersLikedPost(postID: Post.Identifier) -> [User]? {
+        var gettingUsersLikedPost: [User]?
+        let _ = DataProviders.shared.postsDataProvider.usersLikedPost(with: postID, queue: DispatchQueue.global(qos: .utility)) {
+            (usersLikedPost) in
+            DispatchQueue.main.async {
+                gettingUsersLikedPost = usersLikedPost
+//                return usersLikedPost
+            }
+        }
+        return gettingUsersLikedPost
+    }
+    
     // MARK: - Распознователи жестов
     private func setGestureRecognizers() {
         
@@ -69,7 +110,7 @@ class FeedTableViewCell: UITableViewCell {
     
     // MARK: - Настройка элементов ячейки
     func fillingCell(_ post: Post) {
-        
+                
         // Запись в переменную ID поста ячейки
         cellPostID = post.id
         
@@ -103,7 +144,7 @@ class FeedTableViewCell: UITableViewCell {
     /// Двойной тап по картинке поста
     @IBAction func tapPostImage(recognizer: UITapGestureRecognizer) {
         
-        guard let post = DataProviders.shared.postsDataProvider.post(with: cellPostID) else { return }
+        guard let post = getPost(postID: cellPostID) else { return }
         
         // Проверка отсутствия у поста лайка текущего пользователя
         guard !post.currentUserLikesThisPost else { return }
@@ -122,8 +163,8 @@ class FeedTableViewCell: UITableViewCell {
     
     /// Тап по автору поста
     @IBAction func tapAuthorOfPost(recognizer: UIGestureRecognizer) {
-        guard let post = DataProviders.shared.postsDataProvider.post(with: cellPostID) else { return }
-        guard let user = DataProviders.shared.usersDataProvider.user(with: post.author) else { return }
+        guard let post = getPost(postID: cellPostID) else { return }
+        guard let user = getUser(userID: post.author) else { return }
         delegate?.tapAuthorOfPost(user: user)
     }
     
@@ -131,13 +172,7 @@ class FeedTableViewCell: UITableViewCell {
     @IBAction func tapLikesCountLabel(recognizer: UIGestureRecognizer) {
         
         // Создание массива пользователей, лайкнувших пост
-        guard let userIDList = DataProviders.shared.postsDataProvider.usersLikedPost(with: cellPostID) else { return }
-        var userList = [User]()
-        userIDList.forEach {
-            if let user = DataProviders.shared.usersDataProvider.user(with: $0) {
-                userList.append(user)
-            }
-        }
+        guard let userList = getUsersLikedPost(postID: cellPostID) else { return }
         
         // Передача массива пользователей для дальнейшего перехода на экран лайкнувших пост пользователей
         delegate?.tapLikesCountLabel(userList: userList)
@@ -152,17 +187,19 @@ class FeedTableViewCell: UITableViewCell {
     /// Лайк, либо отмена лайка поста
     private func likeUnlikePost() {
         
-        guard let post = DataProviders.shared.postsDataProvider.post(with: cellPostID) else { return }
-        
+        guard let post = getPost(postID: cellPostID) else { return }
+
         // Лайк/анлайк поста
         if post.currentUserLikesThisPost {
-            let _ = DataProviders.shared.postsDataProvider.unlikePost(with: cellPostID)
+//            let _ = DataProviders.shared.postsDataProvider.unlikePost(with: cellPostID)
+            let _ = DataProviders.shared.postsDataProvider.unlikePost(with: cellPostID, queue: DispatchQueue.main) { (post) in }
         } else {
-            let _ = DataProviders.shared.postsDataProvider.likePost(with: cellPostID)
+//            let _ = DataProviders.shared.postsDataProvider.likePost(with: cellPostID)
+            let _ = DataProviders.shared.postsDataProvider.likePost(with: cellPostID, queue: DispatchQueue.main) { (post) in }
         }
         
         // Получение обновлённого поста
-        guard let updatedPost = DataProviders.shared.postsDataProvider.post(with: cellPostID) else { return }
+        guard let updatedPost = getPost(postID: cellPostID) else { return }
         
         // Обновление отображения количества лайков у поста
         likesCountLabel.text = setCountLikesForPost(updatedPost)

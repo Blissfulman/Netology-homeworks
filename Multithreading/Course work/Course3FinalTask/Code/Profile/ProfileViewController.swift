@@ -19,29 +19,50 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
     lazy var photosOfUser = [UIImage]()
     
     // По умолчанию вью отображает данные текущего пользователя
-    lazy var user: User = DataProviders.shared.usersDataProvider.currentUser()
+    var user: User!
     
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = user.username
+        getCurrentUser()
+        
+//        sleep(3)
+        
+//        navigationItem.title = user.username
         
         photosCollectionView.register(UINib(nibName: "PhotoCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "photoCell")
         photosCollectionView.register(UINib(nibName: "HeaderProfileCollectionView", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile")
         
         photosCollectionView.dataSource = self
         photosCollectionView.delegate = self
-        getPhotos(user)
+//        getPhotos(user)
     }
     
     // MARK: - Методы получения данных
-    /// Получение фотографий постов пользователя
-    private func getPhotos(_ user: User) {
-        if let filteredPosts = DataProviders.shared.postsDataProvider.findPosts(by: user.id) {
-            filteredPosts.forEach { photosOfUser.append($0.image) }
+    /// Возвращает текущего пользователя.
+    private func getCurrentUser() {
+//        var gettingUser: User
+        let _ = DataProviders.shared.usersDataProvider.currentUser(queue: DispatchQueue.main) {
+            (currentUser) in
+            guard let currentUser = currentUser else {
+                print("Current user was not recieved")
+                return
+            }
+//            DispatchQueue.main.async {
+//                gettingUser = currentUser
+                self.user = currentUser
+//            }
         }
+//        return gettingUser
     }
+    
+    /// Получение фотографий постов пользователя
+//    private func getPhotos(_ user: User?) {
+//        if let filteredPosts = DataProviders.shared.postsDataProvider.findPosts(by: user.id) {
+//            filteredPosts.forEach { photosOfUser.append($0.image) }
+//        }
+//    }
     
     // MARK: - СollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -78,16 +99,16 @@ extension ProfileViewController: UICollectionViewDelegateFlowLayout, HeaderProfi
     
     // MARK: - Навигация
     func tapFollowersLabel() {
-        guard let userList = DataProviders.shared.usersDataProvider.usersFollowedByUser(with: user.id) else { return }
-        let followersVC = UserListViewController(userList: userList)
-        followersVC.title = "Followers"
-        navigationController?.pushViewController(followersVC, animated: true)
+//        guard let userList = DataProviders.shared.usersDataProvider.usersFollowedByUser(with: user.id) else { return }
+//        let followersVC = UserListViewController(userList: userList)
+//        followersVC.title = "Followers"
+//        navigationController?.pushViewController(followersVC, animated: true)
     }
     
     func tapFollowingLabel() {
-        guard let userList = DataProviders.shared.usersDataProvider.usersFollowingUser(with: user.id) else { return }
-        let followingVC = UserListViewController(userList: userList)
-        followingVC.title = "Following"
-        navigationController?.pushViewController(followingVC, animated: true)
+//        guard let userList = DataProviders.shared.usersDataProvider.usersFollowingUser(with: user.id) else { return }
+//        let followingVC = UserListViewController(userList: userList)
+//        followingVC.title = "Following"
+//        navigationController?.pushViewController(followingVC, animated: true)
     }
 }
