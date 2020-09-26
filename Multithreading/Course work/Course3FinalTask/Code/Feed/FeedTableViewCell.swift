@@ -38,44 +38,34 @@ class FeedTableViewCell: UITableViewCell {
     }
     
     // MARK: - Методы получения данных
-    /// Возвращает публикацию с переданным ID.
-    private func getPost(postID: Post.Identifier) -> Post? {
-        var gettingPost: Post?
-        let _ = DataProviders.shared.postsDataProvider.post(with: postID, queue: DispatchQueue.main) {
+    /// Получение публикации с переданным ID.
+    private func getPost(postID: Post.Identifier, closure: @escaping (Post?) -> Void) {
+        let _ = DataProviders.shared.postsDataProvider.post(with: postID, queue: DispatchQueue.global(qos: .userInteractive)) {
             (post) in
-//            DispatchQueue.main.async {
-            print(post)
-            gettingPost = post
-//            }
+            DispatchQueue.main.async {
+                closure(post)
+            }
         }
-//        sleep(2)
-        return gettingPost
     }
     
-    /// Возвращает пользователя с переданным ID.
-    private func getUser(userID: User.Identifier) -> User? {
-        var gettingUser: User?
-        let _ = DataProviders.shared.usersDataProvider.user(with: userID, queue: DispatchQueue.main) {
+    /// Получение пользователя с переданным ID.
+    private func getUser(userID: User.Identifier, closure: @escaping (User?) -> Void) {
+        let _ = DataProviders.shared.usersDataProvider.user(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
             (user) in
             DispatchQueue.main.async {
-                gettingUser = user
-//                return user
+                closure(user)
             }
         }
-        return gettingUser
     }
     
-    /// Возвращает пользователей поставивших лайк на публикацию.
-    private func getUsersLikedPost(postID: Post.Identifier) -> [User]? {
-        var gettingUsersLikedPost: [User]?
-        let _ = DataProviders.shared.postsDataProvider.usersLikedPost(with: postID, queue: DispatchQueue.global(qos: .utility)) {
+    /// Получение пользователей, поставивших лайк на публикацию.
+    private func getUsersLikedPost(postID: Post.Identifier, closure: @escaping ([User]?) -> Void) {
+        let _ = DataProviders.shared.postsDataProvider.usersLikedPost(with: postID, queue: DispatchQueue.global(qos: .userInteractive)) {
             (usersLikedPost) in
             DispatchQueue.main.async {
-                gettingUsersLikedPost = usersLikedPost
-//                return usersLikedPost
+                closure(usersLikedPost)
             }
         }
-        return gettingUsersLikedPost
     }
     
     // MARK: - Распознователи жестов
@@ -144,38 +134,57 @@ class FeedTableViewCell: UITableViewCell {
     /// Двойной тап по картинке поста
     @IBAction func tapPostImage(recognizer: UITapGestureRecognizer) {
         
-        guard let post = getPost(postID: cellPostID) else { return }
-        
-        // Проверка отсутствия у поста лайка текущего пользователя
-        guard !post.currentUserLikesThisPost else { return }
-        
-        // Анимация большого сердца
-        let likeAnimation = CAKeyframeAnimation(keyPath: "opacity")
-        likeAnimation.values = [0, 1, 1, 0]
-        likeAnimation.keyTimes = [0, 0.1, 0.3, 0.6]
-        likeAnimation.timingFunctions = [.init(name: .linear), .init(name: .linear), .init(name: .easeOut)]
-        likeAnimation.duration = 0.6
-        bigLikeImage.layer.add(likeAnimation, forKey: nil)
-        
-        // Обработка лайка
-        likeUnlikePost()
+        getPost(postID: cellPostID) {
+            (post) in
+            
+            guard let post = post else { return }
+            
+            // Проверка отсутствия у поста лайка текущего пользователя
+            guard !post.currentUserLikesThisPost else { return }
+            
+            // Анимация большого сердца
+            let likeAnimation = CAKeyframeAnimation(keyPath: "opacity")
+            likeAnimation.values = [0, 1, 1, 0]
+            likeAnimation.keyTimes = [0, 0.1, 0.3, 0.6]
+            likeAnimation.timingFunctions = [.init(name: .linear), .init(name: .linear), .init(name: .easeOut)]
+            likeAnimation.duration = 0.6
+            self.bigLikeImage.layer.add(likeAnimation, forKey: nil)
+            
+            // Обработка лайка
+            self.likeUnlikePost()
+        }
     }
     
     /// Тап по автору поста
     @IBAction func tapAuthorOfPost(recognizer: UIGestureRecognizer) {
-        guard let post = getPost(postID: cellPostID) else { return }
-        guard let user = getUser(userID: post.author) else { return }
-        delegate?.tapAuthorOfPost(user: user)
+        
+        getPost(postID: cellPostID) {
+            (post) in
+            
+            guard let post = post else { return }
+            
+            self.getUser(userID: post.author) {
+                (user) in
+                
+                guard let user = user else { return }
+                
+                self.delegate?.tapAuthorOfPost(user: user)
+            }
+        }
     }
     
     /// Тап по количеству лайков поста
     @IBAction func tapLikesCountLabel(recognizer: UIGestureRecognizer) {
         
         // Создание массива пользователей, лайкнувших пост
-        guard let userList = getUsersLikedPost(postID: cellPostID) else { return }
-        
-        // Передача массива пользователей для дальнейшего перехода на экран лайкнувших пост пользователей
-        delegate?.tapLikesCountLabel(userList: userList)
+        getUsersLikedPost(postID: cellPostID) {
+            (userList) in
+            
+            guard let userList = userList else { return }
+            
+            // Передача массива пользователей для дальнейшего перехода на экран лайкнувших пост пользователей
+            self.delegate?.tapLikesCountLabel(userList: userList)
+        }
     }
     
     /// Тап  по сердечку под постом
@@ -187,27 +196,33 @@ class FeedTableViewCell: UITableViewCell {
     /// Лайк, либо отмена лайка поста
     private func likeUnlikePost() {
         
-        guard let post = getPost(postID: cellPostID) else { return }
-
-        // Лайк/анлайк поста
-        if post.currentUserLikesThisPost {
-//            let _ = DataProviders.shared.postsDataProvider.unlikePost(with: cellPostID)
-            let _ = DataProviders.shared.postsDataProvider.unlikePost(with: cellPostID, queue: DispatchQueue.main) { (post) in }
-        } else {
-//            let _ = DataProviders.shared.postsDataProvider.likePost(with: cellPostID)
-            let _ = DataProviders.shared.postsDataProvider.likePost(with: cellPostID, queue: DispatchQueue.main) { (post) in }
+        getPost(postID: cellPostID) {
+            (post) in
+            
+            guard let post = post else { return }
+            
+            // Лайк/анлайк поста
+            if post.currentUserLikesThisPost {
+                let _ = DataProviders.shared.postsDataProvider.unlikePost(with: self.cellPostID, queue: .main) { _ in }
+            } else {
+                let _ = DataProviders.shared.postsDataProvider.likePost(with: self.cellPostID, queue: .main) { _ in }
+            }
+            
+            // Получение обновлённого поста
+            self.getPost(postID: self.cellPostID) {
+                (updatedPost) in
+                
+                guard let updatedPost = updatedPost else { return }
+                
+                // Обновление отображения количества лайков у поста
+                self.likesCountLabel.text = self.setCountLikesForPost(updatedPost)
+                
+                // Смена цвета сердечка
+                self.setLikeImageColor(updatedPost)
+                
+                // Обновление данных в массиве постов
+                self.delegate?.updateFeedData()
+            }
         }
-        
-        // Получение обновлённого поста
-        guard let updatedPost = getPost(postID: cellPostID) else { return }
-        
-        // Обновление отображения количества лайков у поста
-        likesCountLabel.text = setCountLikesForPost(updatedPost)
-        
-        // Смена цвета сердечка
-        setLikeImageColor(updatedPost)
-        
-        // Обновление данных в массиве постов
-        delegate?.updateFeedData()
     }
 }

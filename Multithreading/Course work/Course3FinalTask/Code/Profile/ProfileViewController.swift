@@ -19,50 +19,78 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
     lazy var photosOfUser = [UIImage]()
     
     // По умолчанию вью отображает данные текущего пользователя
-    var user: User!
+    var user: User?
     
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        getCurrentUser()
-        
-//        sleep(3)
-        
-//        navigationItem.title = user.username
         
         photosCollectionView.register(UINib(nibName: "PhotoCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "photoCell")
         photosCollectionView.register(UINib(nibName: "HeaderProfileCollectionView", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile")
         
         photosCollectionView.dataSource = self
         photosCollectionView.delegate = self
-//        getPhotos(user)
+        
+        if let user = user {
+            navigationItem.title = user.username
+            getPhotos(user: user)
+            photosCollectionView.reloadData()
+        } else {
+            getCurrentUser()
+        }
     }
     
     // MARK: - Методы получения данных
-    /// Возвращает текущего пользователя.
+    /// Получение текущего пользователя.
     private func getCurrentUser() {
-//        var gettingUser: User
-        let _ = DataProviders.shared.usersDataProvider.currentUser(queue: DispatchQueue.main) {
+        let _ = DataProviders.shared.usersDataProvider.currentUser(queue: DispatchQueue.global(qos: .userInitiated)) {
             (currentUser) in
-            guard let currentUser = currentUser else {
-                print("Current user was not recieved")
-                return
-            }
-//            DispatchQueue.main.async {
-//                gettingUser = currentUser
+            
+            guard let currentUser = currentUser else { return }
+            
+            DispatchQueue.main.async {
                 self.user = currentUser
-//            }
+                self.navigationItem.title = self.user?.username
+                self.photosCollectionView.reloadData()
+                self.getPhotos(user: currentUser)
+            }
         }
-//        return gettingUser
     }
     
-    /// Получение фотографий постов пользователя
-//    private func getPhotos(_ user: User?) {
-//        if let filteredPosts = DataProviders.shared.postsDataProvider.findPosts(by: user.id) {
-//            filteredPosts.forEach { photosOfUser.append($0.image) }
-//        }
-//    }
+    /// Получение всех публикаций пользователя с переданным ID.
+    private func getPhotos(user: User) {
+        let _ = DataProviders.shared.postsDataProvider.findPosts(by: user.id, queue: DispatchQueue.global(qos: .userInitiated)) {
+            (userPosts) in
+            if let userPosts = userPosts {
+                userPosts.forEach { self.photosOfUser.append($0.image) }
+                DispatchQueue.main.async {
+                    self.photosCollectionView.reloadData()
+                }
+            }
+        }
+    }
+    
+    /// Получение всех подписок пользователя.
+    private func getUsersFollowedByUser(with userID: User.Identifier, closure: @escaping ([User]?) -> Void) {
+        let _ = DataProviders.shared.usersDataProvider.usersFollowedByUser(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
+            (usersFollowedByUser) in
+                        
+            DispatchQueue.main.async {
+                closure(usersFollowedByUser)
+            }
+        }
+    }
+    
+    /// Получение всех подписчиков пользователя.
+    private func getUsersFollowingUser(with userID: User.Identifier, closure: @escaping ([User]?) -> Void) {
+        let _ = DataProviders.shared.usersDataProvider.usersFollowingUser(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
+            (usersFollowingUser) in
+                        
+            DispatchQueue.main.async {
+                closure(usersFollowingUser)
+            }
+        }
+    }
     
     // MARK: - СollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -72,7 +100,9 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
             let reusableView = photosCollectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile", for: indexPath) as! HeaderProfileCollectionView
             reusableView.frame = CGRect(x: 0 , y: 0, width: self.view.frame.width, height: 86)
             reusableView.delegate = self
-            reusableView.configure(user: user)
+            if let user = user {
+                reusableView.configure(user: user)
+            }
             return reusableView
         default: fatalError("Unexpected element kind")
         }
@@ -99,16 +129,32 @@ extension ProfileViewController: UICollectionViewDelegateFlowLayout, HeaderProfi
     
     // MARK: - Навигация
     func tapFollowersLabel() {
-//        guard let userList = DataProviders.shared.usersDataProvider.usersFollowedByUser(with: user.id) else { return }
-//        let followersVC = UserListViewController(userList: userList)
-//        followersVC.title = "Followers"
-//        navigationController?.pushViewController(followersVC, animated: true)
+        
+        guard let user = user else { return }
+        
+        getUsersFollowedByUser(with: user.id) {
+            (userList) in
+            
+            guard let userList = userList else { return }
+            
+            let followersVC = UserListViewController(userList: userList)
+            followersVC.title = "Followers"
+            self.navigationController?.pushViewController(followersVC, animated: true)
+        }
     }
     
     func tapFollowingLabel() {
-//        guard let userList = DataProviders.shared.usersDataProvider.usersFollowingUser(with: user.id) else { return }
-//        let followingVC = UserListViewController(userList: userList)
-//        followingVC.title = "Following"
-//        navigationController?.pushViewController(followingVC, animated: true)
+        
+        guard let user = user else { return }
+        
+        getUsersFollowingUser(with: user.id) {
+            (userList) in
+            
+            guard let userList = userList else { return }
+            
+            let followingVC = UserListViewController(userList: userList)
+            followingVC.title = "Following"
+            self.navigationController?.pushViewController(followingVC, animated: true)
+        }
     }
 }

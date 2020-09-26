@@ -14,7 +14,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     // MARK: - Свойства
     /// Массив постов ленты
-    private var feedPosts: [Post]!
+    private var feedPosts: [Post]?
     
     @IBOutlet weak var feedTableView: UITableView!
         
@@ -23,8 +23,6 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
         super.viewDidLoad()
         
         getFeedPosts()
-
-        sleep(2)
         
         feedTableView.dataSource = self
         feedTableView.delegate = self
@@ -32,26 +30,30 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     // MARK: - Методы получения данных
-    /// Возвращает публикации пользователей на которых подписан текущий пользователь
+    /// Получение публикаций пользователей, на которых подписан текущий пользователь.
     private func getFeedPosts() {
-        let _ = DataProviders.shared.postsDataProvider.feed(queue: DispatchQueue.global(qos: .utility)) {
+        let _ = DataProviders.shared.postsDataProvider.feed(queue: DispatchQueue.global(qos: .userInitiated)) {
             (feedPosts) in
-            guard let feedPosts = feedPosts else {
-                print("Feed posts were not recieved")
-                return
+            
+            guard let feedPosts = feedPosts else { return }
+            
+            DispatchQueue.main.async {
+                self.feedPosts = feedPosts
+                self.feedTableView.reloadData()
             }
-            self.feedPosts = feedPosts
         }
     }
     
     // MARK: - CollectionViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return feedPosts.count
+        return feedPosts?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "postCell", for: indexPath) as! FeedTableViewCell
-        cell.fillingCell(feedPosts![indexPath.row])
+        if let feedPosts = feedPosts {
+            cell.fillingCell(feedPosts[indexPath.row])
+        }
         cell.delegate = self
         return cell
     }
