@@ -14,13 +14,20 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     // MARK: - Свойства
     /// Массив постов ленты
-    private var feedPosts: [Post]?
+    private var feedPosts = [Post]()
     
     @IBOutlet weak var feedTableView: UITableView!
+    
+    /// Блокирующее вью, отображаемое во время одижания получения данных
+    let blockView = BlockView()
         
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        guard let parentViewForBlockView = self.tabBarController?.view else { return }
+        self.blockView.parentView = parentViewForBlockView
+        blockView.setup()
         
         getFeedPosts()
         
@@ -32,7 +39,13 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     // MARK: - Методы получения данных
     /// Получение публикаций пользователей, на которых подписан текущий пользователь.
     private func getFeedPosts() {
-        let _ = DataProviders.shared.postsDataProvider.feed(queue: DispatchQueue.global(qos: .userInitiated)) {
+        
+        // Блокирующее вью запустится только если функция вызвана из главного потока
+        if Thread.current == .main {
+            blockView.show()
+        }
+        
+        DataProviders.shared.postsDataProvider.feed(queue: DispatchQueue.global(qos: .userInitiated)) {
             (feedPosts) in
             
             guard let feedPosts = feedPosts else { return }
@@ -40,20 +53,19 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
             DispatchQueue.main.async {
                 self.feedPosts = feedPosts
                 self.feedTableView.reloadData()
+                self.blockView.hide()
             }
         }
     }
     
     // MARK: - CollectionViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return feedPosts?.count ?? 0
+        return feedPosts.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "postCell", for: indexPath) as! FeedTableViewCell
-        if let feedPosts = feedPosts {
-            cell.fillingCell(feedPosts[indexPath.row])
-        }
+        cell.fillingCell(feedPosts[indexPath.row])
         cell.delegate = self
         return cell
     }
@@ -78,6 +90,17 @@ extension FeedViewController: FeedTableViewCellDelegate {
     
     /// Обновление данных массива постов ленты
     func updateFeedData() {
-        getFeedPosts()
+        // Запуск выполняется в фоновом потоке, т.к. происходит после лайка/анлайка
+        DispatchQueue.global(qos: .utility).async {
+            self.getFeedPosts()
+        }
+    }
+    
+    func showBlockView() {
+        blockView.show()
+    }
+    
+    func hideBlockView() {
+        blockView.hide()
     }
 }

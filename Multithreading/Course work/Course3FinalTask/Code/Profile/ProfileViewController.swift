@@ -18,12 +18,19 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
     /// Массив фотографий постов пользователя
     lazy var photosOfUser = [UIImage]()
     
-    // По умолчанию вью отображает данные текущего пользователя
+    /// Пользователь, данные которого отображает вью
     var user: User?
+    
+    /// Блокирующее вью, отображаемое во время одижания получения данных
+    let blockView = BlockView()
     
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        guard let parentViewForBlockView = self.tabBarController?.view else { return }
+        self.blockView.parentView = parentViewForBlockView
+        blockView.setup()
         
         photosCollectionView.register(UINib(nibName: "PhotoCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "photoCell")
         photosCollectionView.register(UINib(nibName: "HeaderProfileCollectionView", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile")
@@ -43,7 +50,10 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
     // MARK: - Методы получения данных
     /// Получение текущего пользователя.
     private func getCurrentUser() {
-        let _ = DataProviders.shared.usersDataProvider.currentUser(queue: DispatchQueue.global(qos: .userInitiated)) {
+        
+        blockView.show()
+        
+        DataProviders.shared.usersDataProvider.currentUser(queue: DispatchQueue.global(qos: .userInitiated)) {
             (currentUser) in
             
             guard let currentUser = currentUser else { return }
@@ -51,7 +61,6 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
             DispatchQueue.main.async {
                 self.user = currentUser
                 self.navigationItem.title = self.user?.username
-                self.photosCollectionView.reloadData()
                 self.getPhotos(user: currentUser)
             }
         }
@@ -59,12 +68,16 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
     
     /// Получение всех публикаций пользователя с переданным ID.
     private func getPhotos(user: User) {
-        let _ = DataProviders.shared.postsDataProvider.findPosts(by: user.id, queue: DispatchQueue.global(qos: .userInitiated)) {
+        
+        blockView.show()
+        
+        DataProviders.shared.postsDataProvider.findPosts(by: user.id, queue: DispatchQueue.global(qos: .userInitiated)) {
             (userPosts) in
             if let userPosts = userPosts {
                 userPosts.forEach { self.photosOfUser.append($0.image) }
                 DispatchQueue.main.async {
                     self.photosCollectionView.reloadData()
+                    self.blockView.hide()
                 }
             }
         }
@@ -72,22 +85,30 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
     
     /// Получение всех подписок пользователя.
     private func getUsersFollowedByUser(with userID: User.Identifier, closure: @escaping ([User]?) -> Void) {
-        let _ = DataProviders.shared.usersDataProvider.usersFollowedByUser(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
+        
+        blockView.show()
+        
+        DataProviders.shared.usersDataProvider.usersFollowedByUser(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
             (usersFollowedByUser) in
                         
             DispatchQueue.main.async {
                 closure(usersFollowedByUser)
+                self.blockView.hide()
             }
         }
     }
     
     /// Получение всех подписчиков пользователя.
     private func getUsersFollowingUser(with userID: User.Identifier, closure: @escaping ([User]?) -> Void) {
-        let _ = DataProviders.shared.usersDataProvider.usersFollowingUser(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
+        
+        blockView.show()
+        
+        DataProviders.shared.usersDataProvider.usersFollowingUser(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
             (usersFollowingUser) in
                         
             DispatchQueue.main.async {
                 closure(usersFollowingUser)
+                self.blockView.hide()
             }
         }
     }

@@ -13,6 +13,8 @@ protocol FeedTableViewCellDelegate: AnyObject {
     func tapAuthorOfPost(user: User)
     func tapLikesCountLabel(userList: [User])
     func updateFeedData()
+    func showBlockView()
+    func hideBlockView()
 }
 
 class FeedTableViewCell: UITableViewCell {
@@ -40,7 +42,7 @@ class FeedTableViewCell: UITableViewCell {
     // MARK: - Методы получения данных
     /// Получение публикации с переданным ID.
     private func getPost(postID: Post.Identifier, closure: @escaping (Post?) -> Void) {
-        let _ = DataProviders.shared.postsDataProvider.post(with: postID, queue: DispatchQueue.global(qos: .userInteractive)) {
+        DataProviders.shared.postsDataProvider.post(with: postID, queue: DispatchQueue.global(qos: .userInteractive)) {
             (post) in
             DispatchQueue.main.async {
                 closure(post)
@@ -50,7 +52,7 @@ class FeedTableViewCell: UITableViewCell {
     
     /// Получение пользователя с переданным ID.
     private func getUser(userID: User.Identifier, closure: @escaping (User?) -> Void) {
-        let _ = DataProviders.shared.usersDataProvider.user(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
+        DataProviders.shared.usersDataProvider.user(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
             (user) in
             DispatchQueue.main.async {
                 closure(user)
@@ -60,7 +62,7 @@ class FeedTableViewCell: UITableViewCell {
     
     /// Получение пользователей, поставивших лайк на публикацию.
     private func getUsersLikedPost(postID: Post.Identifier, closure: @escaping ([User]?) -> Void) {
-        let _ = DataProviders.shared.postsDataProvider.usersLikedPost(with: postID, queue: DispatchQueue.global(qos: .userInteractive)) {
+        DataProviders.shared.postsDataProvider.usersLikedPost(with: postID, queue: DispatchQueue.global(qos: .userInteractive)) {
             (usersLikedPost) in
             DispatchQueue.main.async {
                 closure(usersLikedPost)
@@ -158,6 +160,8 @@ class FeedTableViewCell: UITableViewCell {
     /// Тап по автору поста
     @IBAction func tapAuthorOfPost(recognizer: UIGestureRecognizer) {
         
+        delegate?.showBlockView()
+        
         getPost(postID: cellPostID) {
             (post) in
             
@@ -169,12 +173,16 @@ class FeedTableViewCell: UITableViewCell {
                 guard let user = user else { return }
                 
                 self.delegate?.tapAuthorOfPost(user: user)
+                
+                self.delegate?.hideBlockView()
             }
         }
     }
     
     /// Тап по количеству лайков поста
     @IBAction func tapLikesCountLabel(recognizer: UIGestureRecognizer) {
+        
+        delegate?.showBlockView()
         
         // Создание массива пользователей, лайкнувших пост
         getUsersLikedPost(postID: cellPostID) {
@@ -184,6 +192,8 @@ class FeedTableViewCell: UITableViewCell {
             
             // Передача массива пользователей для дальнейшего перехода на экран лайкнувших пост пользователей
             self.delegate?.tapLikesCountLabel(userList: userList)
+            
+            self.delegate?.hideBlockView()
         }
     }
     
@@ -203,9 +213,9 @@ class FeedTableViewCell: UITableViewCell {
             
             // Лайк/анлайк поста
             if post.currentUserLikesThisPost {
-                let _ = DataProviders.shared.postsDataProvider.unlikePost(with: self.cellPostID, queue: .main) { _ in }
+                DataProviders.shared.postsDataProvider.unlikePost(with: self.cellPostID, queue: .main) { _ in }
             } else {
-                let _ = DataProviders.shared.postsDataProvider.likePost(with: self.cellPostID, queue: .main) { _ in }
+                DataProviders.shared.postsDataProvider.likePost(with: self.cellPostID, queue: .main) { _ in }
             }
             
             // Получение обновлённого поста
