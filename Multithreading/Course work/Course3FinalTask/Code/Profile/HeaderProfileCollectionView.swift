@@ -13,6 +13,7 @@ import DataProvider
 protocol HeaderProfileCollectionViewDelegate: AnyObject {
     func tapFollowersLabel()
     func tapFollowingLabel()
+    func followUnfollowUser()
 }
 
 class HeaderProfileCollectionView: UICollectionReusableView {
@@ -24,21 +25,39 @@ class HeaderProfileCollectionView: UICollectionReusableView {
     @IBOutlet weak var fullNameLabel: UILabel!
     @IBOutlet weak var followersLabel: UILabel!
     @IBOutlet weak var followingLabel: UILabel!
+    @IBOutlet weak var followButton: UIButton!
     
     // MARK: - Методы жизненного цикла
     override func awakeFromNib() {
         super.awakeFromNib()
         
+        followButton.layer.cornerRadius = 5
         setGestureRecognizers()
     }
     
     // MARK: - Настройка элементов ячейки
-    func configure(user: User) {
+    func configure(user: User, isCurrentUser: Bool) {
         avatarImage.image = user.avatar
         avatarImage.layer.cornerRadius = CGFloat(avatarImage.bounds.width / 2)
         fullNameLabel.text = user.fullName
-        followersLabel.text = "Followers: " + String(user.followsCount)
-        followingLabel.text = "Following: " + String(user.followedByCount)
+        followersLabel.text = "Followers: " + String(user.followedByCount)
+        followingLabel.text = "Following: " + String(user.followsCount)
+        
+        // Если это не профиль текущего пользователя, то устанавливается кнопка подписки/отписки
+        if !isCurrentUser {
+            setupFollowButton(user: user)
+        }
+    }
+    
+    private func setupFollowButton(user: User) {
+    
+        if user.currentUserFollowsThisUser {
+            followButton.setTitle("Unfollow", for: .normal)
+        } else {
+            followButton.setTitle("Follow", for: .normal)
+        }
+        
+        followButton.isHidden = false
     }
     
     // MARK: - Распознователи жестов
@@ -55,12 +74,16 @@ class HeaderProfileCollectionView: UICollectionReusableView {
         followingLabel.addGestureRecognizer(followingGR)
     }
     
-    // MARK: - Действия на жесты
+    // MARK: - Действия на жесты / нажатие кнопки
     @IBAction func tapFollowersLabel(recognizer: UIGestureRecognizer) {
         delegate?.tapFollowersLabel()
     }
     
     @IBAction func tapFollowingLabel(recognizer: UIGestureRecognizer) {
         delegate?.tapFollowingLabel()
+    }
+    
+    @IBAction func followButtonClick(_ sender: UIButton) {
+        delegate?.followUnfollowUser()
     }
 }

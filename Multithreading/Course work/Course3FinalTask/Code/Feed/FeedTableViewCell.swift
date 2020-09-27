@@ -23,6 +23,8 @@ class FeedTableViewCell: UITableViewCell {
     private var cellPostID: Post.Identifier = ""
     weak var delegate: FeedTableViewCellDelegate?
     
+//    typealias MyThread = DispatchQueue.global(qos: .userInteractive)
+    
     @IBOutlet weak var avatarImage: UIImageView!
     @IBOutlet weak var authorUsernameLabel: UILabel!
     @IBOutlet weak var createdTimeLabel: UILabel!
@@ -41,31 +43,31 @@ class FeedTableViewCell: UITableViewCell {
     
     // MARK: - Методы получения данных
     /// Получение публикации с переданным ID.
-    private func getPost(postID: Post.Identifier, closure: @escaping (Post?) -> Void) {
-        DataProviders.shared.postsDataProvider.post(with: postID, queue: DispatchQueue.global(qos: .userInteractive)) {
+    private func getPost(postID: Post.Identifier, complition: @escaping (Post?) -> Void) {
+        DataProviders.shared.postsDataProvider.post(with: postID, queue: .global(qos: .userInteractive)) {
             (post) in
             DispatchQueue.main.async {
-                closure(post)
+                complition(post)
             }
         }
     }
     
     /// Получение пользователя с переданным ID.
-    private func getUser(userID: User.Identifier, closure: @escaping (User?) -> Void) {
-        DataProviders.shared.usersDataProvider.user(with: userID, queue: DispatchQueue.global(qos: .userInteractive)) {
+    private func getUser(userID: User.Identifier, complition: @escaping (User?) -> Void) {
+        DataProviders.shared.usersDataProvider.user(with: userID, queue: .global(qos: .userInteractive)) {
             (user) in
             DispatchQueue.main.async {
-                closure(user)
+                complition(user)
             }
         }
     }
     
     /// Получение пользователей, поставивших лайк на публикацию.
-    private func getUsersLikedPost(postID: Post.Identifier, closure: @escaping ([User]?) -> Void) {
-        DataProviders.shared.postsDataProvider.usersLikedPost(with: postID, queue: DispatchQueue.global(qos: .userInteractive)) {
+    private func getUsersLikedPost(postID: Post.Identifier, complition: @escaping ([User]?) -> Void) {
+        DataProviders.shared.postsDataProvider.usersLikedPost(with: postID, queue: .global(qos: .userInteractive)) {
             (usersLikedPost) in
             DispatchQueue.main.async {
-                closure(usersLikedPost)
+                complition(usersLikedPost)
             }
         }
     }
@@ -133,7 +135,7 @@ class FeedTableViewCell: UITableViewCell {
     }
     
     // MARK: - Действия на жесты
-    /// Двойной тап по картинке поста
+    /// Двойной тап по картинке поста.
     @IBAction func tapPostImage(recognizer: UITapGestureRecognizer) {
         
         getPost(postID: cellPostID) {
@@ -157,7 +159,7 @@ class FeedTableViewCell: UITableViewCell {
         }
     }
     
-    /// Тап по автору поста
+    /// Тап по автору поста.
     @IBAction func tapAuthorOfPost(recognizer: UIGestureRecognizer) {
         
         delegate?.showBlockView()
@@ -179,7 +181,7 @@ class FeedTableViewCell: UITableViewCell {
         }
     }
     
-    /// Тап по количеству лайков поста
+    /// Тап по количеству лайков поста.
     @IBAction func tapLikesCountLabel(recognizer: UIGestureRecognizer) {
         
         delegate?.showBlockView()
@@ -197,13 +199,13 @@ class FeedTableViewCell: UITableViewCell {
         }
     }
     
-    /// Тап  по сердечку под постом
+    /// Тап  по сердечку под постом.
     @IBAction func tapLikeImage(recognizer: UIGestureRecognizer) {
         likeUnlikePost()
     }
     
     // MARK: - Обработка лайков
-    /// Лайк, либо отмена лайка поста
+    /// Лайк, либо отмена лайка поста.
     private func likeUnlikePost() {
         
         getPost(postID: cellPostID) {

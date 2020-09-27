@@ -12,7 +12,7 @@ import DataProvider
 class UserListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     // MARK: - Свойства
-    /// Список пользователей для отображения в таблице
+    /// Список пользователей для отображения в таблице.
     private var userList: [User] = []
     
     private lazy var userListTableView: UITableView = {

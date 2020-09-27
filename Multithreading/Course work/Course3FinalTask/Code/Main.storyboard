@@ -174,7 +174,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="cI6-S4-sUy"/>
                     <connections>
-                        <outlet property="photosCollectionView" destination="0Ia-nN-bDm" id="TCL-gx-lXg"/>
+                        <outlet property="profileCollectionView" destination="0Ia-nN-bDm" id="TCL-gx-lXg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W05-Mk-Aqc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -253,6 +253,29 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7e5-NC-GaQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1024" y="905"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="8WK-JH-LQU">
+            <objects>
+                <viewController id="g6O-j2-g37" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="0GF-Ek-wK0">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tJH-uE-UP3">
+                                <rect key="frame" x="185" y="354" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <state key="normal" title="Button"/>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="5WX-to-M3e"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="OM9-uZ-pHp" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="684" y="1710"/>
         </scene>
     </scenes>
     <resources>

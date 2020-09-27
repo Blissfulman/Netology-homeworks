@@ -13,12 +13,12 @@ import DataProvider
 class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     // MARK: - Свойства
-    /// Массив постов ленты
+    /// Массив постов ленты.
     private var feedPosts = [Post]()
     
     @IBOutlet weak var feedTableView: UITableView!
     
-    /// Блокирующее вью, отображаемое во время одижания получения данных
+    /// Блокирующее вью, отображаемое во время одижания получения данных.
     let blockView = BlockView()
         
     // MARK: - Методы жизненного цикла
@@ -36,6 +36,10 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
         feedTableView.separatorStyle = .none
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        getFeedPosts()
+    }
+    
     // MARK: - Методы получения данных
     /// Получение публикаций пользователей, на которых подписан текущий пользователь.
     private func getFeedPosts() {
@@ -45,8 +49,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
             blockView.show()
         }
         
-        DataProviders.shared.postsDataProvider.feed(queue: DispatchQueue.global(qos: .userInitiated)) {
-            (feedPosts) in
+        DataProviders.shared.postsDataProvider.feed(queue: .global(qos: .userInitiated)) { (feedPosts) in
             
             guard let feedPosts = feedPosts else { return }
             
@@ -74,21 +77,21 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
 // MARK: - FeedTableViewCellDelegate
 extension FeedViewController: FeedTableViewCellDelegate {
     
-    /// Переход в профиль автора поста
+    /// Переход в профиль автора поста.
     func tapAuthorOfPost(user: User) {
         guard let profileVC = storyboard?.instantiateViewController(withIdentifier: "ProfileViewController") as? ProfileViewController else { return }
         profileVC.user = user
         show(profileVC, sender: nil)
     }
     
-    /// Переход на экран лайкнувших пост пользователей
+    /// Переход на экран лайкнувших пост пользователей.
     func tapLikesCountLabel(userList: [User]) {
         let likesCV = UserListViewController(userList: userList)
         likesCV.title = "Likes"
         show(likesCV, sender: nil)
     }
     
-    /// Обновление данных массива постов ленты
+    /// Обновление данных массива постов ленты.
     func updateFeedData() {
         // Запуск выполняется в фоновом потоке, т.к. происходит после лайка/анлайка
         DispatchQueue.global(qos: .utility).async {

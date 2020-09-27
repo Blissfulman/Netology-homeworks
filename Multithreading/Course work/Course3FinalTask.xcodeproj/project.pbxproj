@@ -14,12 +14,12 @@
 		CE6D676E24E02574002FE7F2 /* UserListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6D676D24E02574002FE7F2 /* UserListViewController.swift */; };
 		CE6E2D5224D947DA00A4B08B /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6E2D5124D947DA00A4B08B /* ProfileViewController.swift */; };
 		CE6E2D5624D9BD3300A4B08B /* FeedTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6E2D5524D9BD3300A4B08B /* FeedTableViewCell.swift */; };
-		CEB0222424DD79C3009D0615 /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB0222324DD79C3009D0615 /* PhotoCollectionViewCell.swift */; };
+		CEB0222424DD79C3009D0615 /* ProfileCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB0222324DD79C3009D0615 /* ProfileCollectionViewCell.swift */; };
 		CEB1669D251FAF9700DF6F98 /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB1669C251FAF9700DF6F98 /* BlockView.swift */; };
 		CECB0BFB24C86E870086A593 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CECB0BFA24C86E870086A593 /* Main.storyboard */; };
 		CECB0BFD24C86FFA0086A593 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CECB0BFC24C86FFA0086A593 /* LaunchScreen.storyboard */; };
 		CECB0BFF24C8725D0086A593 /* FeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CECB0BFE24C8725D0086A593 /* FeedViewController.swift */; };
-		CED3279024DE6E4000BB1A80 /* PhotoCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CED3278F24DE6E4000BB1A80 /* PhotoCollectionViewCell.xib */; };
+		CED3279024DE6E4000BB1A80 /* ProfileCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CED3278F24DE6E4000BB1A80 /* ProfileCollectionViewCell.xib */; };
 		CED3279424DED5EC00BB1A80 /* HeaderProfileCollectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CED3279324DED5EC00BB1A80 /* HeaderProfileCollectionView.xib */; };
 		CED3279624DED6D200BB1A80 /* HeaderProfileCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED3279524DED6D200BB1A80 /* HeaderProfileCollectionView.swift */; };
 /* End PBXBuildFile section */
@@ -47,12 +47,12 @@
 		CE6D676D24E02574002FE7F2 /* UserListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewController.swift; sourceTree = "<group>"; };
 		CE6E2D5124D947DA00A4B08B /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		CE6E2D5524D9BD3300A4B08B /* FeedTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedTableViewCell.swift; sourceTree = "<group>"; };
-		CEB0222324DD79C3009D0615 /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
+		CEB0222324DD79C3009D0615 /* ProfileCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCollectionViewCell.swift; sourceTree = "<group>"; };
 		CEB1669C251FAF9700DF6F98 /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BlockView.swift; path = Course3FinalTask/Code/BlockView.swift; sourceTree = SOURCE_ROOT; };
 		CECB0BFA24C86E870086A593 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		CECB0BFC24C86FFA0086A593 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CECB0BFE24C8725D0086A593 /* FeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewController.swift; sourceTree = "<group>"; };
-		CED3278F24DE6E4000BB1A80 /* PhotoCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhotoCollectionViewCell.xib; sourceTree = "<group>"; };
+		CED3278F24DE6E4000BB1A80 /* ProfileCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ProfileCollectionViewCell.xib; sourceTree = "<group>"; };
 		CED3279324DED5EC00BB1A80 /* HeaderProfileCollectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HeaderProfileCollectionView.xib; sourceTree = "<group>"; };
 		CED3279524DED6D200BB1A80 /* HeaderProfileCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderProfileCollectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -147,8 +147,8 @@
 			isa = PBXGroup;
 			children = (
 				CE6E2D5124D947DA00A4B08B /* ProfileViewController.swift */,
-				CEB0222324DD79C3009D0615 /* PhotoCollectionViewCell.swift */,
-				CED3278F24DE6E4000BB1A80 /* PhotoCollectionViewCell.xib */,
+				CEB0222324DD79C3009D0615 /* ProfileCollectionViewCell.swift */,
+				CED3278F24DE6E4000BB1A80 /* ProfileCollectionViewCell.xib */,
 				CED3279524DED6D200BB1A80 /* HeaderProfileCollectionView.swift */,
 				CED3279324DED5EC00BB1A80 /* HeaderProfileCollectionView.xib */,
 			);
@@ -216,7 +216,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CED3279024DE6E4000BB1A80 /* PhotoCollectionViewCell.xib in Resources */,
+				CED3279024DE6E4000BB1A80 /* ProfileCollectionViewCell.xib in Resources */,
 				CECB0BFD24C86FFA0086A593 /* LaunchScreen.storyboard in Resources */,
 				CED3279424DED5EC00BB1A80 /* HeaderProfileCollectionView.xib in Resources */,
 				74B7925F202B3254006BCB41 /* Assets.xcassets in Resources */,
@@ -238,7 +238,7 @@
 				CE6E2D5224D947DA00A4B08B /* ProfileViewController.swift in Sources */,
 				CE6E2D5624D9BD3300A4B08B /* FeedTableViewCell.swift in Sources */,
 				CED3279624DED6D200BB1A80 /* HeaderProfileCollectionView.swift in Sources */,
-				CEB0222424DD79C3009D0615 /* PhotoCollectionViewCell.swift in Sources */,
+				CEB0222424DD79C3009D0615 /* ProfileCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
