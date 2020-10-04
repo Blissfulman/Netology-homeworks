@@ -1,15 +1,15 @@
 //
-//  PhotoCollectionViewCell.swift
-//  Course2FinalTask
+//  NewPostCollectionViewCell.swift
+//  Course3FinalTask
 //
-//  Created by User on 07.08.2020.
+//  Created by User on 03.10.2020.
 //  Copyright © 2020 e-Legion. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-class ProfileCollectionViewCell: UICollectionViewCell {
+class NewPostCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet weak var photoImage: UIImageView!
     

@@ -21,6 +21,7 @@ class BlockView: UIView {
         // Настройка самого вью
         self.backgroundColor = .black
         self.alpha = 0.7
+        self.isHidden = true
         self.translatesAutoresizingMaskIntoConstraints = false
         parentView.addSubview(self)
                 
@@ -33,7 +34,7 @@ class BlockView: UIView {
         NSLayoutConstraint.activate(constraints)
         
         // Настройка индикатора активности
-        activityIndicator.color = .white
+        activityIndicator.style = .white
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(activityIndicator)
         

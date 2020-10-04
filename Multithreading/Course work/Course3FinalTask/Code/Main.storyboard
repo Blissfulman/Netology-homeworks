@@ -133,7 +133,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zs3-ce-uxG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2018.840579710145" y="44.836956521739133"/>
+            <point key="canvasLocation" x="2019" y="174"/>
         </scene>
         <!--Profile View Controller-->
         <scene sceneID="dnL-jU-D8c">
@@ -179,7 +179,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W05-Mk-Aqc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2020.289855072464" y="903.26086956521749"/>
+            <point key="canvasLocation" x="2019" y="1626"/>
         </scene>
         <!--User List View Controller-->
         <scene sceneID="rXj-oY-4bE">
@@ -195,7 +195,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0YD-DH-m9m" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3032" y="525"/>
+            <point key="canvasLocation" x="2994" y="174"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="kMO-g4-OnZ">
@@ -209,6 +209,7 @@
                     </tabBar>
                     <connections>
                         <segue destination="aXB-Ri-5OZ" kind="relationship" relationship="viewControllers" id="hkf-1v-zIt"/>
+                        <segue destination="ees-oG-RTk" kind="relationship" relationship="viewControllers" id="ZfA-oy-x6X"/>
                         <segue destination="Yhy-PF-ndr" kind="relationship" relationship="viewControllers" id="SK2-2j-5vx"/>
                     </connections>
                 </tabBarController>
@@ -233,7 +234,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="s4c-7m-cUS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1023.75" y="45.422535211267608"/>
+            <point key="canvasLocation" x="1022" y="174"/>
         </scene>
         <!--Profile-->
         <scene sceneID="Wib-HK-wQI">
@@ -252,36 +253,49 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7e5-NC-GaQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1024" y="905"/>
+            <point key="canvasLocation" x="1023" y="1626"/>
         </scene>
-        <!--View Controller-->
+        <!--New post-->
         <scene sceneID="8WK-JH-LQU">
             <objects>
-                <viewController id="g6O-j2-g37" sceneMemberID="viewController">
+                <viewController id="g6O-j2-g37" customClass="NewPostViewController" customModule="Course3FinalTask" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="0GF-Ek-wK0">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tJH-uE-UP3">
-                                <rect key="frame" x="185" y="354" width="46" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                <state key="normal" title="Button"/>
-                            </button>
-                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <viewLayoutGuide key="safeArea" id="5WX-to-M3e"/>
                     </view>
+                    <navigationItem key="navigationItem" title="New post" id="Lga-pC-kvc"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OM9-uZ-pHp" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="684" y="1710"/>
+            <point key="canvasLocation" x="2019" y="902"/>
+        </scene>
+        <!--New-->
+        <scene sceneID="S3Z-Wd-xcP">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="ees-oG-RTk" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="New" image="plus" id="5aH-UF-bsC"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Rjy-QN-9Sz">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="g6O-j2-g37" kind="relationship" relationship="rootViewController" id="xM6-I5-ix3"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vqn-rl-GKz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1022" y="902"/>
         </scene>
     </scenes>
     <resources>
         <image name="bigLike" width="100" height="100"/>
         <image name="feed" width="25" height="25"/>
         <image name="like" width="25" height="25"/>
+        <image name="plus" width="25" height="25"/>
         <image name="profile" width="25" height="25"/>
     </resources>
 </document>

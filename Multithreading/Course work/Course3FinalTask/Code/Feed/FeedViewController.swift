@@ -29,7 +29,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
         self.blockView.parentView = parentViewForBlockView
         blockView.setup()
         
-        getFeedPosts()
+        getFeedPosts(isAfterLikeUnlike: false)
         
         feedTableView.dataSource = self
         feedTableView.delegate = self
@@ -37,15 +37,15 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        getFeedPosts()
+        getFeedPosts(isAfterLikeUnlike: false)
     }
     
     // MARK: - Методы получения данных
     /// Получение публикаций пользователей, на которых подписан текущий пользователь.
-    private func getFeedPosts() {
-        
-        // Блокирующее вью запустится только если функция вызвана из главного потока
-        if Thread.current == .main {
+    private func getFeedPosts(isAfterLikeUnlike: Bool) {
+                
+        // Блокирующее вью запустится если функция вызвана не после лайка/анлайка
+        if !isAfterLikeUnlike {
             blockView.show()
         }
         
@@ -55,8 +55,14 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
             
             DispatchQueue.main.async {
                 self.feedPosts = feedPosts
-                self.feedTableView.reloadData()
-                self.blockView.hide()
+                
+                // Если обновление массива постов вызвано после лайков, то reloadData не вызывается
+                if !isAfterLikeUnlike {
+                    self.feedTableView.reloadData()
+                    self.blockView.hide()
+                } else {
+//                    print("Feed updated!")
+                }
             }
         }
     }
@@ -93,10 +99,7 @@ extension FeedViewController: FeedTableViewCellDelegate {
     
     /// Обновление данных массива постов ленты.
     func updateFeedData() {
-        // Запуск выполняется в фоновом потоке, т.к. происходит после лайка/анлайка
-        DispatchQueue.global(qos: .utility).async {
-            self.getFeedPosts()
-        }
+        self.getFeedPosts(isAfterLikeUnlike: true)
     }
     
     func showBlockView() {

@@ -77,7 +77,7 @@
     </objects>
     <resources>
         <namedColor name="FollowButtonColor">
-            <color red="0.0" green="0.58823529411764708" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.58799999952316284" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

@@ -12,8 +12,6 @@ import DataProvider
 
 class ProfileViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
-    @IBOutlet weak var profileCollectionView: UICollectionView!
-    
     // MARK: - Свойства
     /// Массив фотографий постов пользователя.
     lazy var photosOfUser = [UIImage]()
@@ -26,6 +24,8 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
     
     /// Блокирующее вью, отображаемое во время одижания получения данных.
     let blockView = BlockView()
+    
+    @IBOutlet weak var profileCollectionView: UICollectionView!
     
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
@@ -40,37 +40,28 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
         
         profileCollectionView.dataSource = self
         profileCollectionView.delegate = self
-        
-        blockView.show()
-        
-        // Если user == nil, значит отображается начальный экран профиля текущего пользователя
-        guard let user = user else {
+                
+        // Если user != nil, значит это не стартовый экран профиля
+        if let user = user {
+            self.navigationItem.title = user.username
+            self.getPhotos(user: user)
             
+            // Проверка того, открывается ли это профиль текущего пользователя
             getCurrentUser { (currentUser) in
-                    
-                DispatchQueue.main.async {
-                    guard let currentUser = currentUser else { return }
-                    
-                    self.user = currentUser
-                    self.navigationItem.title = currentUser.username
-                    self.getPhotos(user: currentUser)
+                guard let currentUser = currentUser else { return }
+                
+                if user.id != currentUser.id {
+                    self.isCurrentUser = false
                 }
             }
-            return
-        }
-        
-        // Если исполнение долшо до сюда, значит это не стартовый экран профиля
-        getCurrentUser { (currentUser) in
-            guard let currentUser = currentUser else { return }
-            
-            // Проверка того, является ли открываемый профиль пользователя профилем текущего пользователя
-            if user.id != currentUser.id {
-                self.isCurrentUser = false
-            }
-            
-            DispatchQueue.main.async {
-                self.navigationItem.title = user.username
-                self.getPhotos(user: user)
+        } else {
+            // Если user == nil, значит отображается начальный экран профиля текущего пользователя
+            getCurrentUser { (currentUser) in
+                guard let currentUser = currentUser else { return }
+                
+                self.user = currentUser
+                self.navigationItem.title = currentUser.username
+                self.getPhotos(user: currentUser)
             }
         }
     }
@@ -85,8 +76,8 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
             guard let updatedUser = updatedUser else { return }
             
             self.user = updatedUser
-                        
             self.profileCollectionView.reloadData()
+            self.blockView.hide()
         }
     }
     
@@ -96,23 +87,26 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
                 
         DataProviders.shared.usersDataProvider.currentUser(queue: .global(qos: .userInitiated)) {
             (currentUser) in
-            complition(currentUser)
+            
+            DispatchQueue.main.async {
+                complition(currentUser)
+            }
         }
     }
     
     /// Получение всех публикаций пользователя с переданным ID.
     private func getPhotos(user: User) {
-                
+                                
         DataProviders.shared.postsDataProvider.findPosts(by: user.id, queue: .global(qos: .userInitiated)) {
             (userPosts) in
-            
-            if let userPosts = userPosts {
-                userPosts.forEach { self.photosOfUser.append($0.image) }
+                        
+            DispatchQueue.main.async {
+
+                guard let userPosts = userPosts else { return }
                 
-                DispatchQueue.main.async {
-                    self.profileCollectionView.reloadData()
-                    self.blockView.hide()
-                }
+                userPosts.forEach { self.photosOfUser.append($0.image) }
+                self.profileCollectionView.reloadData()
+                self.blockView.hide()
             }
         }
     }
@@ -156,7 +150,6 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
             
             DispatchQueue.main.async {
                 complition(user)
-                self.blockView.hide()
             }
         }
     }
@@ -166,13 +159,13 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
         
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            let reusableView = profileCollectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile", for: indexPath) as! HeaderProfileCollectionView
-            reusableView.frame = CGRect(x: 0 , y: 0, width: self.view.frame.width, height: 86)
-            reusableView.delegate = self
+            let header = profileCollectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile", for: indexPath) as! HeaderProfileCollectionView
+            header.frame = CGRect(x: 0 , y: 0, width: self.view.frame.width, height: 86)
+            header.delegate = self
             if let user = user {
-                reusableView.configure(user: user, isCurrentUser: isCurrentUser)
+                header.configure(user: user, isCurrentUser: isCurrentUser)
             }
-            return reusableView
+            return header
         default: fatalError("Unexpected element kind")
         }
     }
@@ -182,19 +175,22 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = profileCollectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
+        let cell = profileCollectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! ProfileCollectionViewCell
         cell.configure(photosOfUser[indexPath.item])
         return cell
     }
 }
 
-extension ProfileViewController: UICollectionViewDelegateFlowLayout, HeaderProfileCollectionViewDelegate {
+extension ProfileViewController: UICollectionViewDelegateFlowLayout {
     
     // MARK: - Layout
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let size = profileCollectionView.bounds.width / 3
         return CGSize(width: size, height: size)
     }
+}
+
+extension ProfileViewController: HeaderProfileCollectionViewDelegate {
     
     // MARK: - Навигация
     func tapFollowersLabel() {
@@ -246,7 +242,6 @@ extension ProfileViewController: UICollectionViewDelegateFlowLayout, HeaderProfi
             guard let updatedUser = updatedUser else { return }
             
             self.user = updatedUser
-            
             self.profileCollectionView.reloadData()
         }
     }

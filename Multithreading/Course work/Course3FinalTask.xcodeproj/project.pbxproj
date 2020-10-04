@@ -16,6 +16,11 @@
 		CE6E2D5624D9BD3300A4B08B /* FeedTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6E2D5524D9BD3300A4B08B /* FeedTableViewCell.swift */; };
 		CEB0222424DD79C3009D0615 /* ProfileCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB0222324DD79C3009D0615 /* ProfileCollectionViewCell.swift */; };
 		CEB1669D251FAF9700DF6F98 /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB1669C251FAF9700DF6F98 /* BlockView.swift */; };
+		CEBE92AD25264BF6002A6A63 /* NewPostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBE92AB25264BF6002A6A63 /* NewPostViewController.swift */; };
+		CEBE92B02528C4CC002A6A63 /* NewPostCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEBE92AF2528C4CC002A6A63 /* NewPostCollectionViewCell.xib */; };
+		CEBE92B22528C588002A6A63 /* NewPostCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBE92B12528C588002A6A63 /* NewPostCollectionViewCell.swift */; };
+		CEBE92B62529AA7A002A6A63 /* FiltersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBE92B42529AA7A002A6A63 /* FiltersViewController.swift */; };
+		CEBE92B72529AA7A002A6A63 /* FiltersViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEBE92B52529AA7A002A6A63 /* FiltersViewController.xib */; };
 		CECB0BFB24C86E870086A593 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CECB0BFA24C86E870086A593 /* Main.storyboard */; };
 		CECB0BFD24C86FFA0086A593 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CECB0BFC24C86FFA0086A593 /* LaunchScreen.storyboard */; };
 		CECB0BFF24C8725D0086A593 /* FeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CECB0BFE24C8725D0086A593 /* FeedViewController.swift */; };
@@ -49,6 +54,11 @@
 		CE6E2D5524D9BD3300A4B08B /* FeedTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedTableViewCell.swift; sourceTree = "<group>"; };
 		CEB0222324DD79C3009D0615 /* ProfileCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCollectionViewCell.swift; sourceTree = "<group>"; };
 		CEB1669C251FAF9700DF6F98 /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BlockView.swift; path = Course3FinalTask/Code/BlockView.swift; sourceTree = SOURCE_ROOT; };
+		CEBE92AB25264BF6002A6A63 /* NewPostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostViewController.swift; sourceTree = "<group>"; };
+		CEBE92AF2528C4CC002A6A63 /* NewPostCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewPostCollectionViewCell.xib; sourceTree = "<group>"; };
+		CEBE92B12528C588002A6A63 /* NewPostCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostCollectionViewCell.swift; sourceTree = "<group>"; };
+		CEBE92B42529AA7A002A6A63 /* FiltersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersViewController.swift; sourceTree = "<group>"; };
+		CEBE92B52529AA7A002A6A63 /* FiltersViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FiltersViewController.xib; sourceTree = "<group>"; };
 		CECB0BFA24C86E870086A593 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		CECB0BFC24C86FFA0086A593 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CECB0BFE24C8725D0086A593 /* FeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewController.swift; sourceTree = "<group>"; };
@@ -102,6 +112,8 @@
 				74B79257202B3254006BCB41 /* AppDelegate.swift */,
 				CEB1669C251FAF9700DF6F98 /* BlockView.swift */,
 				CED3279724DEE22900BB1A80 /* Feed */,
+				CEBE92AA25264B72002A6A63 /* New Post */,
+				CEBE92B32529A9D7002A6A63 /* Filters */,
 				CED3279824DEE23C00BB1A80 /* Profile */,
 				CE6D676824DFB67A002FE7F2 /* User list */,
 				CECB0BFA24C86E870086A593 /* Main.storyboard */,
@@ -132,6 +144,25 @@
 				CE6D676D24E02574002FE7F2 /* UserListViewController.swift */,
 			);
 			path = "User list";
+			sourceTree = "<group>";
+		};
+		CEBE92AA25264B72002A6A63 /* New Post */ = {
+			isa = PBXGroup;
+			children = (
+				CEBE92AB25264BF6002A6A63 /* NewPostViewController.swift */,
+				CEBE92B12528C588002A6A63 /* NewPostCollectionViewCell.swift */,
+				CEBE92AF2528C4CC002A6A63 /* NewPostCollectionViewCell.xib */,
+			);
+			path = "New Post";
+			sourceTree = "<group>";
+		};
+		CEBE92B32529A9D7002A6A63 /* Filters */ = {
+			isa = PBXGroup;
+			children = (
+				CEBE92B42529AA7A002A6A63 /* FiltersViewController.swift */,
+				CEBE92B52529AA7A002A6A63 /* FiltersViewController.xib */,
+			);
+			path = Filters;
 			sourceTree = "<group>";
 		};
 		CED3279724DEE22900BB1A80 /* Feed */ = {
@@ -217,8 +248,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				CED3279024DE6E4000BB1A80 /* ProfileCollectionViewCell.xib in Resources */,
+				CEBE92B72529AA7A002A6A63 /* FiltersViewController.xib in Resources */,
 				CECB0BFD24C86FFA0086A593 /* LaunchScreen.storyboard in Resources */,
 				CED3279424DED5EC00BB1A80 /* HeaderProfileCollectionView.xib in Resources */,
+				CEBE92B02528C4CC002A6A63 /* NewPostCollectionViewCell.xib in Resources */,
 				74B7925F202B3254006BCB41 /* Assets.xcassets in Resources */,
 				CECB0BFB24C86E870086A593 /* Main.storyboard in Resources */,
 			);
@@ -236,9 +269,12 @@
 				CECB0BFF24C8725D0086A593 /* FeedViewController.swift in Sources */,
 				CE6D676E24E02574002FE7F2 /* UserListViewController.swift in Sources */,
 				CE6E2D5224D947DA00A4B08B /* ProfileViewController.swift in Sources */,
+				CEBE92AD25264BF6002A6A63 /* NewPostViewController.swift in Sources */,
 				CE6E2D5624D9BD3300A4B08B /* FeedTableViewCell.swift in Sources */,
 				CED3279624DED6D200BB1A80 /* HeaderProfileCollectionView.swift in Sources */,
 				CEB0222424DD79C3009D0615 /* ProfileCollectionViewCell.swift in Sources */,
+				CEBE92B62529AA7A002A6A63 /* FiltersViewController.swift in Sources */,
+				CEBE92B22528C588002A6A63 /* NewPostCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
