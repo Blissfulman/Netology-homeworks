@@ -9,15 +9,21 @@
 import UIKit
 import DataProvider
 
-class UserListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class UserListViewController: UIViewController {
     
     // MARK: - Свойства
+    /// Высота строки в таблице.
+    let heightForRow: CGFloat = 45
+    
     /// Список пользователей для отображения в таблице.
     private var userList: [User] = []
     
+    /// Таблица пользователей.
     private lazy var userListTableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.dataSource = self
+        tableView.delegate = self
         return tableView
     }()
     
@@ -28,14 +34,11 @@ class UserListViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     // MARK: - Методы жизненного цикла
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI()
         setupConstraints()
-        userListTableView.dataSource = self
-        userListTableView.delegate = self
     }
     
     // Снятие выделения с ячейки при возврате на вью
@@ -58,6 +61,9 @@ class UserListViewController: UIViewController, UITableViewDataSource, UITableVi
         ]
         NSLayoutConstraint.activate(constraints)
     }
+}
+ 
+extension UserListViewController: UITableViewDataSource, UITableViewDelegate {
     
     // MARK: - TableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -73,7 +79,7 @@ class UserListViewController: UIViewController, UITableViewDataSource, UITableVi
 
     // MARK: - TableViewDelegate
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 45
+        return heightForRow
     }
     
     // Переход на вью пользователя
@@ -81,6 +87,6 @@ class UserListViewController: UIViewController, UITableViewDataSource, UITableVi
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         guard let profileVC = storyboard.instantiateViewController(withIdentifier: "ProfileViewController") as? ProfileViewController else { return }
         profileVC.user = userList[indexPath.row]
-        show(profileVC, sender: nil)
+        navigationController?.pushViewController(profileVC, animated: true)
     }
 }

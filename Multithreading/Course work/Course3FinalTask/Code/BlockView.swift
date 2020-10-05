@@ -14,7 +14,13 @@ class BlockView: UIView {
 
     var parentView = UIView()
     
-    let activityIndicator = UIActivityIndicatorView()
+    private let activityIndicator = UIActivityIndicatorView()
+    
+    convenience init(parentView: UIView) {
+        self.init()
+        self.parentView = parentView
+        setup()
+    }
     
     func setup() {
         

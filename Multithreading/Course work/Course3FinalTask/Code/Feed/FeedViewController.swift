@@ -10,24 +10,24 @@ import Foundation
 import UIKit
 import DataProvider
 
-class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class FeedViewController: UIViewController {
     
     // MARK: - Свойства
+    /// Блокирующее вью, отображаемое во время ожидания получения данных.
+    private lazy var blockView = BlockView(parentView: self.tabBarController?.view ?? self.view)
+    
     /// Массив постов ленты.
     private var feedPosts = [Post]()
     
     @IBOutlet weak var feedTableView: UITableView!
-    
-    /// Блокирующее вью, отображаемое во время одижания получения данных.
-    let blockView = BlockView()
         
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let parentViewForBlockView = self.tabBarController?.view else { return }
-        self.blockView.parentView = parentViewForBlockView
-        blockView.setup()
+//        guard let parentViewForBlockView = self.tabBarController?.view else { return }
+//        self.blockView.parentView = parentViewForBlockView
+//        blockView.setup()
         
         getFeedPosts(isAfterLikeUnlike: false)
         
@@ -66,6 +66,9 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
             }
         }
     }
+}
+ 
+extension FeedViewController: UITableViewDataSource, UITableViewDelegate {
     
     // MARK: - CollectionViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -87,14 +90,14 @@ extension FeedViewController: FeedTableViewCellDelegate {
     func tapAuthorOfPost(user: User) {
         guard let profileVC = storyboard?.instantiateViewController(withIdentifier: "ProfileViewController") as? ProfileViewController else { return }
         profileVC.user = user
-        show(profileVC, sender: nil)
+        navigationController?.pushViewController(profileVC, animated: true)
     }
     
     /// Переход на экран лайкнувших пост пользователей.
     func tapLikesCountLabel(userList: [User]) {
         let likesCV = UserListViewController(userList: userList)
         likesCV.title = "Likes"
-        show(likesCV, sender: nil)
+        navigationController?.pushViewController(likesCV, animated: true)
     }
     
     /// Обновление данных массива постов ленты.

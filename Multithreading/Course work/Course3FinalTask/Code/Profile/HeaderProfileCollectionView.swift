@@ -33,6 +33,7 @@ class HeaderProfileCollectionView: UICollectionReusableView {
         
         followButton.layer.cornerRadius = 5
         setGestureRecognizers()
+        followButton.sizeToFit()
     }
     
     // MARK: - Настройка элементов ячейки

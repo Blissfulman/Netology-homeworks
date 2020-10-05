@@ -20,16 +20,24 @@ protocol FeedTableViewCellDelegate: AnyObject {
 class FeedTableViewCell: UITableViewCell {
 
     // MARK: - Свойства
+    weak var delegate: FeedTableViewCellDelegate?
+    
     /// Пост ячейки
     private var cellPost: Post!
     
     /// Логическое значение, указывающее, лайкнул ли текущий пользователь данный пост.
-    private var isLiked = false
+    private var isLiked = false {
+        didSet {
+            likeImage.tintColor = isLiked ? .systemBlue : .lightGray
+        }
+    }
     
     /// Количество лайков на этой публикации.
-    var likedByCount = 0
-    
-    weak var delegate: FeedTableViewCellDelegate?
+    private var likedByCount = 0 {
+        didSet {
+            likesCountLabel.text = "Likes: " + String(likedByCount)
+        }
+    }
         
     @IBOutlet weak var avatarImage: UIImageView!
     @IBOutlet weak var authorUsernameLabel: UILabel!
@@ -112,16 +120,16 @@ class FeedTableViewCell: UITableViewCell {
     func fillingCell(_ post: Post) {
                 
         // Запись переменных поста
-        cellPost = post
         isLiked = post.currentUserLikesThisPost
         likedByCount = post.likedByCount
+        cellPost = post
         
         // Заполнение всех элементов ячейки данными
         avatarImage.image = post.authorAvatar
         authorUsernameLabel.text = post.authorUsername
         createdTimeLabel.text = setDateAndTime(post.createdTime)
         postImage.image = post.image
-        updateLikeData()
+//        updateLikeData()
         descriptionLabel.text = post.description
     }
     
@@ -133,10 +141,10 @@ class FeedTableViewCell: UITableViewCell {
         return dateFormat.string(from: date as Date)
     }
     
-    private func updateLikeData() {
-        likeImage.tintColor = isLiked ? .systemBlue : .lightGray
-        likesCountLabel.text = "Likes: " + String(likedByCount)
-    }
+//    private func updateLikeData() {
+//        likeImage.tintColor = isLiked ? .systemBlue : .lightGray
+//        likesCountLabel.text = "Likes: " + String(likedByCount)
+//    }
     
     // MARK: - Действия на жесты
     /// Двойной тап по картинке поста.
@@ -203,16 +211,16 @@ class FeedTableViewCell: UITableViewCell {
         // Лайк/анлайк поста
         if isLiked {
             DataProviders.shared.postsDataProvider.unlikePost(with: cellPost.id, queue: .main) { _ in }
-            isLiked = false
-            likedByCount -= 1
+//            isLiked = false
+//            likedByCount -= 1
         } else {
             DataProviders.shared.postsDataProvider.likePost(with: cellPost.id, queue: .main) { _ in }
-            isLiked = true
-            likedByCount += 1
+//            isLiked = true
+//            likedByCount += 1
         }
         
         // Обновление данных о лайках поста в ячейке (количество и цвет сердечка)
-        updateLikeData()
+//        updateLikeData()
         
         // Получение обновлённого поста
         getPost(postID: self.cellPost.id) {
@@ -221,10 +229,9 @@ class FeedTableViewCell: UITableViewCell {
             guard let updatedPost = updatedPost else { return }
             
             // Запись переменных поста
-            self.cellPost = updatedPost
             self.isLiked = updatedPost.currentUserLikesThisPost
             self.likedByCount = updatedPost.likedByCount
-//            print("Cell updated!")
+            self.cellPost = updatedPost
         }
         
         // Обновление данных в массиве постов

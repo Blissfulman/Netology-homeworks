@@ -10,30 +10,29 @@ import Foundation
 import UIKit
 import DataProvider
 
-class ProfileViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class ProfileViewController: UIViewController {
     
     // MARK: - Свойства
-    /// Массив фотографий постов пользователя.
-    lazy var photosOfUser = [UIImage]()
-    
     /// Пользователь, данные которого отображает вью.
     var user: User?
     
+    /// Количество колонок в представлении фотографий.
+    private let numberOfColumnsOfPhotos: CGFloat = 3
+    
+    /// Массив фотографий постов пользователя.
+    private lazy var photosOfUser = [UIImage]()
+    
     /// Логическое значение, указывающее, является ли отображаемый профиль, профилем текущего пользователя.
-    var isCurrentUser = true
+    private var isCurrentUser = true
     
-    /// Блокирующее вью, отображаемое во время одижания получения данных.
-    let blockView = BlockView()
-    
+    /// Блокирующее вью, отображаемое во время ожидания получения данных.
+    private lazy var blockView = BlockView(parentView: self.tabBarController?.view ?? self.view)
+
     @IBOutlet weak var profileCollectionView: UICollectionView!
     
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        guard let parentViewForBlockView = self.tabBarController?.view else { return }
-        self.blockView.parentView = parentViewForBlockView
-        blockView.setup()
         
         profileCollectionView.register(UINib(nibName: "ProfileCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "photoCell")
         profileCollectionView.register(UINib(nibName: "HeaderProfileCollectionView", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile")
@@ -153,6 +152,9 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
             }
         }
     }
+}
+
+extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
     // MARK: - СollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -160,7 +162,7 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             let header = profileCollectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile", for: indexPath) as! HeaderProfileCollectionView
-            header.frame = CGRect(x: 0 , y: 0, width: self.view.frame.width, height: 86)
+//            header.frame = CGRect(x: 0 , y: 0, width: self.view.frame.width, height: 86)
             header.delegate = self
             if let user = user {
                 header.configure(user: user, isCurrentUser: isCurrentUser)
@@ -183,9 +185,9 @@ class ProfileViewController: UIViewController, UICollectionViewDataSource, UICol
 
 extension ProfileViewController: UICollectionViewDelegateFlowLayout {
     
-    // MARK: - Layout
+    // MARK: - CollectionViewLayout
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let size = profileCollectionView.bounds.width / 3
+        let size = profileCollectionView.bounds.width / numberOfColumnsOfPhotos
         return CGSize(width: size, height: size)
     }
 }
