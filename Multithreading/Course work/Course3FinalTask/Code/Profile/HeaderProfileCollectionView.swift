@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import DataProvider
 
-protocol HeaderProfileCollectionViewDelegate: AnyObject {
+protocol HeaderProfileCollectionViewDelegate: UIViewController {
     func tapFollowersLabel()
     func tapFollowingLabel()
     func followUnfollowUser()
@@ -57,7 +57,6 @@ class HeaderProfileCollectionView: UICollectionReusableView {
         } else {
             followButton.setTitle("Follow", for: .normal)
         }
-        
         followButton.isHidden = false
     }
     
@@ -75,7 +74,7 @@ class HeaderProfileCollectionView: UICollectionReusableView {
         followingLabel.addGestureRecognizer(followingGR)
     }
     
-    // MARK: - Действия на жесты / нажатие кнопки
+    // MARK: - Actions
     @IBAction func tapFollowersLabel(recognizer: UIGestureRecognizer) {
         delegate?.tapFollowersLabel()
     }

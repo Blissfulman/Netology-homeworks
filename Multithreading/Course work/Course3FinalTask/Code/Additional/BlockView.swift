@@ -12,7 +12,7 @@ import UIKit
 /// Блокирующее вью с индикатором активности.
 class BlockView: UIView {
 
-    var parentView = UIView()
+    private var parentView = UIView()
     
     private let activityIndicator = UIActivityIndicatorView()
     
@@ -25,24 +25,24 @@ class BlockView: UIView {
     func setup() {
         
         // Настройка самого вью
-        self.backgroundColor = .black
-        self.alpha = 0.7
-        self.isHidden = true
-        self.translatesAutoresizingMaskIntoConstraints = false
+        backgroundColor = .black
+        alpha = 0.7
+        isHidden = true
+        translatesAutoresizingMaskIntoConstraints = false
         parentView.addSubview(self)
                 
         let constraints = [
-            self.topAnchor.constraint(equalTo: parentView.topAnchor),
-            self.leadingAnchor.constraint(equalTo: parentView.leadingAnchor),
-            self.trailingAnchor.constraint(equalTo: parentView.trailingAnchor),
-            self.bottomAnchor.constraint(equalTo: parentView.bottomAnchor)
+            topAnchor.constraint(equalTo: parentView.topAnchor),
+            leadingAnchor.constraint(equalTo: parentView.leadingAnchor),
+            trailingAnchor.constraint(equalTo: parentView.trailingAnchor),
+            bottomAnchor.constraint(equalTo: parentView.bottomAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
         
         // Настройка индикатора активности
         activityIndicator.style = .white
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(activityIndicator)
+        addSubview(activityIndicator)
         
         activityIndicator.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         activityIndicator.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
@@ -50,11 +50,11 @@ class BlockView: UIView {
     
     func show() {
         activityIndicator.startAnimating()
-        self.isHidden = false
+        isHidden = false
     }
     
     func hide () {
-        self.isHidden = true
+        isHidden = true
         activityIndicator.stopAnimating()
     }
 }

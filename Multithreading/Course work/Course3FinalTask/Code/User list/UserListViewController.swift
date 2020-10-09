@@ -12,9 +12,6 @@ import DataProvider
 class UserListViewController: UIViewController {
     
     // MARK: - Свойства
-    /// Высота строки в таблице.
-    let heightForRow: CGFloat = 45
-    
     /// Список пользователей для отображения в таблице.
     private var userList: [User] = []
     
@@ -26,6 +23,9 @@ class UserListViewController: UIViewController {
         tableView.delegate = self
         return tableView
     }()
+    
+    /// Высота строки в таблице.
+    private let heightForRow: CGFloat = 45
     
     // MARK: - Инициализаторы
     convenience init(userList: [User]) {
@@ -47,11 +47,12 @@ class UserListViewController: UIViewController {
         userListTableView.deselectRow(at: selectedRow, animated: true)
     }
     
-    // MARK: - Layout
+    // MARK: - Setup UI
     private func setupUI() {
         view.addSubview(userListTableView)
     }
     
+    // MARK: - Layout
     private func setupConstraints() {
         let constraints = [
             userListTableView.topAnchor.constraint(equalTo: view.topAnchor),

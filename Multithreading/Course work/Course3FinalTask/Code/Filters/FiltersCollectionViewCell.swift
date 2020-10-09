@@ -10,8 +10,16 @@ import UIKit
 
 class FiltersCollectionViewCell: UICollectionViewCell {
 
+    @IBOutlet weak var exampleImage: UIImageView!
+    @IBOutlet weak var filterNameLabel: UILabel!
+    
     override func awakeFromNib() {
-        super.awakeFromNib()
+//        super.awakeFromNib()
+    }
+    
+    func configure(photo: UIImage, filterName: String) {
+        exampleImage.image = photo
+        filterNameLabel.text = filterName
     }
 
 }

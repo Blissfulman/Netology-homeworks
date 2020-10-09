@@ -34,16 +34,20 @@ class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        profileCollectionView.register(UINib(nibName: "ProfileCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "photoCell")
-        profileCollectionView.register(UINib(nibName: "HeaderProfileCollectionView", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile")
+        profileCollectionView.register(UINib(nibName: "ProfileCollectionViewCell",
+                                             bundle: nil),
+                                       forCellWithReuseIdentifier: "photoCell")
+        profileCollectionView.register(UINib(nibName: "HeaderProfileCollectionView",
+                                             bundle: nil),
+                                       forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                       withReuseIdentifier: "headerProfile")
         
         profileCollectionView.dataSource = self
-        profileCollectionView.delegate = self
                 
         // Если user != nil, значит это не стартовый экран профиля
         if let user = user {
-            self.navigationItem.title = user.username
-            self.getPhotos(user: user)
+            navigationItem.title = user.username
+            getPhotos(user: user)
             
             // Проверка того, открывается ли это профиль текущего пользователя
             getCurrentUser { (currentUser) in
@@ -71,98 +75,28 @@ class ProfileViewController: UIViewController {
         
         // Обновление данных об отображаемом пользователе
         getUser { (updatedUser) in
-            
-            guard let updatedUser = updatedUser else { return }
+
+            guard let updatedUser = updatedUser else {
+                let alert = ErrorAlertController(parentVC: self)
+                alert.show()
+                return
+            }
             
             self.user = updatedUser
             self.profileCollectionView.reloadData()
             self.blockView.hide()
         }
     }
-    
-    // MARK: - Методы получения данных
-    /// Получение текущего пользователя.
-    private func getCurrentUser(complition: @escaping (_ currentUser: User?) -> Void) {
-                
-        DataProviders.shared.usersDataProvider.currentUser(queue: .global(qos: .userInitiated)) {
-            (currentUser) in
-            
-            DispatchQueue.main.async {
-                complition(currentUser)
-            }
-        }
-    }
-    
-    /// Получение всех публикаций пользователя с переданным ID.
-    private func getPhotos(user: User) {
-                                
-        DataProviders.shared.postsDataProvider.findPosts(by: user.id, queue: .global(qos: .userInitiated)) {
-            (userPosts) in
-                        
-            DispatchQueue.main.async {
-
-                guard let userPosts = userPosts else { return }
-                
-                userPosts.forEach { self.photosOfUser.append($0.image) }
-                self.profileCollectionView.reloadData()
-                self.blockView.hide()
-            }
-        }
-    }
-    
-    /// Получение всех подписок пользователя.
-    private func getUsersFollowedByUser(with userID: User.Identifier, complition: @escaping ([User]?) -> Void) {
-        
-        blockView.show()
-        
-        DataProviders.shared.usersDataProvider.usersFollowedByUser(with: userID, queue: .global(qos: .userInteractive)) {
-            (usersFollowedByUser) in
-                        
-            DispatchQueue.main.async {
-                complition(usersFollowedByUser)
-                self.blockView.hide()
-            }
-        }
-    }
-    
-    /// Получение всех подписчиков пользователя.
-    private func getUsersFollowingUser(with userID: User.Identifier, complition: @escaping ([User]?) -> Void) {
-        
-        blockView.show()
-        
-        DataProviders.shared.usersDataProvider.usersFollowingUser(with: userID, queue: .global(qos: .userInteractive)) {
-            (usersFollowingUser) in
-                        
-            DispatchQueue.main.async {
-                complition(usersFollowingUser)
-                self.blockView.hide()
-            }
-        }
-    }
-    
-    private func getUser(complition: @escaping (User?) -> Void) {
-        
-        guard let user = user else { return }
-        
-        DataProviders.shared.usersDataProvider.user(with: user.id, queue: .global(qos: .userInteractive)) {
-            (user) in
-            
-            DispatchQueue.main.async {
-                complition(user)
-            }
-        }
-    }
 }
 
-extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+// MARK: - СollectionViewDataSource
+extension ProfileViewController: UICollectionViewDataSource {
     
-    // MARK: - СollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             let header = profileCollectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile", for: indexPath) as! HeaderProfileCollectionView
-//            header.frame = CGRect(x: 0 , y: 0, width: self.view.frame.width, height: 86)
             header.delegate = self
             if let user = user {
                 header.configure(user: user, isCurrentUser: isCurrentUser)
@@ -183,15 +117,16 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
     }
 }
 
+// MARK: - CollectionViewLayout
 extension ProfileViewController: UICollectionViewDelegateFlowLayout {
     
-    // MARK: - CollectionViewLayout
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let size = profileCollectionView.bounds.width / numberOfColumnsOfPhotos
         return CGSize(width: size, height: size)
     }
 }
 
+// MARK: - HeaderProfileCollectionViewDelegate
 extension ProfileViewController: HeaderProfileCollectionViewDelegate {
     
     // MARK: - Навигация
@@ -202,7 +137,11 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
         getUsersFollowingUser(with: user.id) {
             (userList) in
             
-            guard let userList = userList else { return }
+            guard let userList = userList else {
+                let alert = ErrorAlertController(parentVC: self)
+                alert.show()
+                return
+            }
             
             let followersVC = UserListViewController(userList: userList)
             followersVC.title = "Followers"
@@ -217,7 +156,11 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
         getUsersFollowedByUser(with: user.id) {
             (userList) in
             
-            guard let userList = userList else { return }
+            guard let userList = userList else {
+                let alert = ErrorAlertController(parentVC: self)
+                alert.show()
+                return
+            }
             
             let followingVC = UserListViewController(userList: userList)
             followingVC.title = "Following"
@@ -241,10 +184,94 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
         // Обновление данных об отображаемом пользователе
         getUser { (updatedUser) in
             
-            guard let updatedUser = updatedUser else { return }
+            guard let updatedUser = updatedUser else {
+                let alert = ErrorAlertController(parentVC: self)
+                alert.show()
+                return
+            }
             
             self.user = updatedUser
             self.profileCollectionView.reloadData()
+        }
+    }
+}
+
+// MARK: - Методы получения данных
+extension ProfileViewController {
+    
+    /// Получение текущего пользователя.
+    private func getCurrentUser(completion: @escaping (_ currentUser: User?) -> Void) {
+                
+        DataProviders.shared.usersDataProvider.currentUser(queue: .global(qos: .userInteractive)) {
+            (currentUser) in
+            
+            DispatchQueue.main.async {
+                completion(currentUser)
+            }
+        }
+    }
+    
+    /// Получение всех публикаций пользователя с переданным ID.
+    private func getPhotos(user: User) {
+                                
+        DataProviders.shared.postsDataProvider.findPosts(by: user.id, queue: .global(qos: .userInteractive)) {
+            (userPosts) in
+                        
+            DispatchQueue.main.async {
+
+                guard let userPosts = userPosts else {
+                    let alert = ErrorAlertController(parentVC: self)
+                    alert.show()
+                    return
+                }
+                
+                userPosts.forEach { self.photosOfUser.append($0.image) }
+                self.profileCollectionView.reloadData()
+                self.blockView.hide()
+            }
+        }
+    }
+    
+    /// Получение всех подписок пользователя.
+    private func getUsersFollowedByUser(with userID: User.Identifier, completion: @escaping ([User]?) -> Void) {
+        
+        blockView.show()
+        
+        DataProviders.shared.usersDataProvider.usersFollowedByUser(with: userID, queue: .global(qos: .userInteractive)) {
+            (usersFollowedByUser) in
+                        
+            DispatchQueue.main.async {
+                completion(usersFollowedByUser)
+                self.blockView.hide()
+            }
+        }
+    }
+    
+    /// Получение всех подписчиков пользователя.
+    private func getUsersFollowingUser(with userID: User.Identifier, completion: @escaping ([User]?) -> Void) {
+        
+        blockView.show()
+        
+        DataProviders.shared.usersDataProvider.usersFollowingUser(with: userID, queue: .global(qos: .userInteractive)) {
+            (usersFollowingUser) in
+                        
+            DispatchQueue.main.async {
+                completion(usersFollowingUser)
+                self.blockView.hide()
+            }
+        }
+    }
+    
+    private func getUser(completion: @escaping (User?) -> Void) {
+        
+        guard let user = user else { return }
+        
+        DataProviders.shared.usersDataProvider.user(with: user.id, queue: .global(qos: .userInteractive)) {
+            (user) in
+            
+            DispatchQueue.main.async {
+                completion(user)
+            }
         }
     }
 }
