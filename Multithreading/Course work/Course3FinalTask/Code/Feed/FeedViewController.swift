@@ -24,9 +24,7 @@ class FeedViewController: UIViewController {
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//        getFeedPosts(isAfterLikeUnlike: false)
-        
+                
         feedTableView.dataSource = self
         feedTableView.separatorStyle = .none
     }
@@ -102,6 +100,7 @@ extension FeedViewController {
             guard let feedPosts = feedPosts else {
                 let alert = ErrorAlertController(parentVC: self)
                 alert.show()
+                self.blockView.hide()
                 return
             }
             

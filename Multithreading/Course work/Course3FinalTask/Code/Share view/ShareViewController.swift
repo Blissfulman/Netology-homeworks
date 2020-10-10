@@ -13,15 +13,15 @@ class ShareViewController: UIViewController {
     
     // MARK: - Свойства
     /// Переданное изображение для публикации.
-    private lazy var transferredImage = UIImage()
+    private lazy var transmittedImage = UIImage()
     
     @IBOutlet weak var shareImage: UIImageView!
     @IBOutlet weak var descriptionTextField: UITextField!
     
     // MARK: - Инициализаторы
-    convenience init(shareImage: UIImage) {
+    convenience init(transmittedImage: UIImage) {
         self.init()
-        transferredImage = shareImage
+        self.transmittedImage = transmittedImage
     }
     
     // MARK: - Методы жизненного цикла
@@ -33,7 +33,7 @@ class ShareViewController: UIViewController {
     
     // MARK: - Setup UI
     func setupUI() {
-        shareImage.image = transferredImage
+        shareImage.image = transmittedImage
         
         let shareButton = UIBarButtonItem(title: "Share",
                                          style: .plain,
@@ -49,7 +49,7 @@ class ShareViewController: UIViewController {
         
         // Публикация нового поста
         DataProviders.shared.postsDataProvider
-            .newPost(with: transferredImage,
+            .newPost(with: transmittedImage,
                      description: description,
                      queue: .main) { _ in
                         

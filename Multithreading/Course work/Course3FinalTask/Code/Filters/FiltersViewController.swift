@@ -110,8 +110,8 @@ class FiltersViewController: UIViewController {
     
     // MARK: - Actions
     @objc func pressedNextButton() {
-        guard let shareImage = bigImage.image else { return }
-        let shareVC = ShareViewController(shareImage: shareImage)
+        guard let image = bigImage.image else { return }
+        let shareVC = ShareViewController(transmittedImage: image)
         navigationController?.pushViewController(shareVC, animated: true)
     }
 }

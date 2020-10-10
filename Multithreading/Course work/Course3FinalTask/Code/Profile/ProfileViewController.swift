@@ -15,56 +15,63 @@ class ProfileViewController: UIViewController {
     // MARK: - Свойства
     /// Пользователь, данные которого отображает вью.
     var user: User?
-    
-    /// Количество колонок в представлении фотографий.
-    private let numberOfColumnsOfPhotos: CGFloat = 3
-    
+        
     /// Массив фотографий постов пользователя.
     private lazy var photosOfUser = [UIImage]()
     
     /// Логическое значение, указывающее, является ли отображаемый профиль, профилем текущего пользователя.
-    private var isCurrentUser = true
+    private var isCurrentUser: Bool?
     
     /// Блокирующее вью, отображаемое во время ожидания получения данных.
     private lazy var blockView = BlockView(parentView: self.tabBarController?.view ?? self.view)
 
+    /// Количество колонок в представлении фотографий.
+    private let numberOfColumnsOfPhotos: CGFloat = 3
+    
+    /// Очередь для выстраивания запросов данных у провайдера.
+    private let queue = DispatchQueue(label: "Queue",
+                                      qos: .userInteractive)
+    /// Семафор для установки порядка запросов к провайдеру.
+    private let semaphore = DispatchSemaphore(value: 1)
+    
+    /// Коллекция, отображающая информацию о пользователе.
     @IBOutlet weak var profileCollectionView: UICollectionView!
     
     // MARK: - Методы жизненного цикла
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        profileCollectionView.register(UINib(nibName: "ProfileCollectionViewCell",
-                                             bundle: nil),
-                                       forCellWithReuseIdentifier: "photoCell")
-        profileCollectionView.register(UINib(nibName: "HeaderProfileCollectionView",
-                                             bundle: nil),
+        profileCollectionView.register(ProfileCollectionViewCell.nib(),
+                                       forCellWithReuseIdentifier: ProfileCollectionViewCell.identifier)
+        profileCollectionView.register(HeaderProfileCollectionView.nib(),
                                        forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                       withReuseIdentifier: "headerProfile")
-        
+                                       withReuseIdentifier: HeaderProfileCollectionView.identifier)
+
         profileCollectionView.dataSource = self
                 
-        // Если user != nil, значит это не стартовый экран профиля
-        if let user = user {
-            navigationItem.title = user.username
-            getPhotos(user: user)
+        queue.async {
             
-            // Проверка того, открывается ли это профиль текущего пользователя
-            getCurrentUser { (currentUser) in
-                guard let currentUser = currentUser else { return }
+            self.semaphore.wait()
+
+            self.getCurrentUser { (currentUser) in
                 
-                if user.id != currentUser.id {
-                    self.isCurrentUser = false
+                guard let currentUser = currentUser else {
+                    let alert = ErrorAlertController(parentVC: self)
+                    alert.show()
+                    self.semaphore.signal()
+                    return
                 }
-            }
-        } else {
-            // Если user == nil, значит отображается начальный экран профиля текущего пользователя
-            getCurrentUser { (currentUser) in
-                guard let currentUser = currentUser else { return }
-                
-                self.user = currentUser
-                self.navigationItem.title = currentUser.username
-                self.getPhotos(user: currentUser)
+
+                // Проверка того, открывается ли профиль текущего пользователя
+                if let userID = self.user?.id, userID != currentUser.id {
+                    self.isCurrentUser = false
+                } else {
+                    self.isCurrentUser = true
+                    self.user = currentUser
+                }
+
+                self.navigationItem.title = self.user?.username
+                self.semaphore.signal()
             }
         }
     }
@@ -73,18 +80,27 @@ class ProfileViewController: UIViewController {
         
         blockView.show()
         
-        // Обновление данных об отображаемом пользователе
-        getUser { (updatedUser) in
-
-            guard let updatedUser = updatedUser else {
-                let alert = ErrorAlertController(parentVC: self)
-                alert.show()
-                return
-            }
+        queue.async {
             
-            self.user = updatedUser
-            self.profileCollectionView.reloadData()
-            self.blockView.hide()
+            self.semaphore.wait()
+            
+            // Обновление данных о пользователе
+            self.getUser { (user) in
+                                
+                guard let user = user else {
+                    let alert = ErrorAlertController(parentVC: self)
+                    alert.show()
+                    self.semaphore.signal()
+                    return
+                }
+                
+                self.user = user
+                self.profileCollectionView.reloadData()
+                self.semaphore.signal()
+                
+                // Обновление данных об изображениях постов пользователя
+                self.getPhotos(user: user)
+            }
         }
     }
 }
@@ -98,7 +114,7 @@ extension ProfileViewController: UICollectionViewDataSource {
         case UICollectionView.elementKindSectionHeader:
             let header = profileCollectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile", for: indexPath) as! HeaderProfileCollectionView
             header.delegate = self
-            if let user = user {
+            if let user = user, let isCurrentUser = isCurrentUser {
                 header.configure(user: user, isCurrentUser: isCurrentUser)
             }
             return header
@@ -201,23 +217,25 @@ extension ProfileViewController {
     
     /// Получение текущего пользователя.
     private func getCurrentUser(completion: @escaping (_ currentUser: User?) -> Void) {
-                
-        DataProviders.shared.usersDataProvider.currentUser(queue: .global(qos: .userInteractive)) {
+
+        DataProviders.shared.usersDataProvider.currentUser(queue: .main) {
             (currentUser) in
-            
-            DispatchQueue.main.async {
-                completion(currentUser)
-            }
+
+            completion(currentUser)
         }
     }
     
     /// Получение всех публикаций пользователя с переданным ID.
     private func getPhotos(user: User) {
-                                
+                
         DataProviders.shared.postsDataProvider.findPosts(by: user.id, queue: .global(qos: .userInteractive)) {
             (userPosts) in
                         
             DispatchQueue.main.async {
+                
+                defer {
+                    self.blockView.hide()
+                }
 
                 guard let userPosts = userPosts else {
                     let alert = ErrorAlertController(parentVC: self)
@@ -225,9 +243,10 @@ extension ProfileViewController {
                     return
                 }
                 
+                self.photosOfUser = []
                 userPosts.forEach { self.photosOfUser.append($0.image) }
+                
                 self.profileCollectionView.reloadData()
-                self.blockView.hide()
             }
         }
     }

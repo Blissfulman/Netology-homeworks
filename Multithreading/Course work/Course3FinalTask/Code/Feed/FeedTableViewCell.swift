@@ -56,41 +56,6 @@ class FeedTableViewCell: UITableViewCell {
         setGestureRecognizers()
     }
     
-    // MARK: - Распознователи жестов
-    private func setGestureRecognizers() {
-        
-        // Жест двойного тапа по картинке поста
-        let postImageGR = UITapGestureRecognizer(target: self,
-                                                 action: #selector(tapPostImage(recognizer:)))
-        postImageGR.numberOfTapsRequired = 2
-        postImage.isUserInteractionEnabled = true
-        postImage.addGestureRecognizer(postImageGR)
-        
-        // Жест тапа по автору поста (по аватарке)
-        let authorAvatarGR = UITapGestureRecognizer(target: self,
-                                                    action: #selector(tapAuthorOfPost(recognizer:)))
-        avatarImage.isUserInteractionEnabled = true
-        avatarImage.addGestureRecognizer(authorAvatarGR)
-        
-        // Жест тапа по автору поста (по username)
-        let authorUsernameGR = UITapGestureRecognizer(target: self,
-                                                      action: #selector(tapAuthorOfPost(recognizer:)))
-        authorUsernameLabel.isUserInteractionEnabled = true
-        authorUsernameLabel.addGestureRecognizer(authorUsernameGR)
-        
-        // Жест тапа по количеству лайков поста
-        let likesCountGR = UITapGestureRecognizer(target: self,
-                                                  action: #selector(tapLikesCountLabel(recognizer:)))
-        likesCountLabel.isUserInteractionEnabled = true
-        likesCountLabel.addGestureRecognizer(likesCountGR)
-        
-        // Жест тапа по сердечку под постом
-        let likeImageGR = UITapGestureRecognizer(target: self,
-                                                 action: #selector(tapLikeImage(recognizer:)))
-        likeImage.isUserInteractionEnabled = true
-        likeImage.addGestureRecognizer(likeImageGR)
-    }
-    
     // MARK: - Настройка элементов ячейки
     func fillingCell(_ post: Post) {
                 
@@ -128,12 +93,12 @@ class FeedTableViewCell: UITableViewCell {
         // Лайк/анлайк поста
         if isLiked {
             DataProviders.shared.postsDataProvider.unlikePost(with: cellPost.id, queue: .main) { _ in }
-//            isLiked = false
-//            likedByCount -= 1
+            isLiked = false
+            likedByCount -= 1
         } else {
             DataProviders.shared.postsDataProvider.likePost(with: cellPost.id, queue: .main) { _ in }
-//            isLiked = true
-//            likedByCount += 1
+            isLiked = true
+            likedByCount += 1
         }
         
         // Обновление данных о лайках поста в ячейке (количество и цвет сердечка)
@@ -159,9 +124,44 @@ class FeedTableViewCell: UITableViewCell {
     }
 }
 
-// MARK: - Действия на жесты
 extension FeedTableViewCell {
     
+    // MARK: - Установка распознователей жестов
+    private func setGestureRecognizers() {
+        
+        // Жест двойного тапа по картинке поста
+        let postImageGR = UITapGestureRecognizer(target: self,
+                                                 action: #selector(tapPostImage(recognizer:)))
+        postImageGR.numberOfTapsRequired = 2
+        postImage.isUserInteractionEnabled = true
+        postImage.addGestureRecognizer(postImageGR)
+        
+        // Жест тапа по автору поста (по аватарке)
+        let authorAvatarGR = UITapGestureRecognizer(target: self,
+                                                    action: #selector(tapAuthorOfPost(recognizer:)))
+        avatarImage.isUserInteractionEnabled = true
+        avatarImage.addGestureRecognizer(authorAvatarGR)
+        
+        // Жест тапа по автору поста (по username)
+        let authorUsernameGR = UITapGestureRecognizer(target: self,
+                                                      action: #selector(tapAuthorOfPost(recognizer:)))
+        authorUsernameLabel.isUserInteractionEnabled = true
+        authorUsernameLabel.addGestureRecognizer(authorUsernameGR)
+        
+        // Жест тапа по количеству лайков поста
+        let likesCountGR = UITapGestureRecognizer(target: self,
+                                                  action: #selector(tapLikesCountLabel(recognizer:)))
+        likesCountLabel.isUserInteractionEnabled = true
+        likesCountLabel.addGestureRecognizer(likesCountGR)
+        
+        // Жест тапа по сердечку под постом
+        let likeImageGR = UITapGestureRecognizer(target: self,
+                                                 action: #selector(tapLikeImage(recognizer:)))
+        likeImage.isUserInteractionEnabled = true
+        likeImage.addGestureRecognizer(likeImageGR)
+    }
+
+    // MARK: - Actions
     /// Двойной тап по картинке поста.
     @IBAction func tapPostImage(recognizer: UITapGestureRecognizer) {
         
@@ -183,6 +183,10 @@ extension FeedTableViewCell {
     /// Тап по автору поста.
     @IBAction func tapAuthorOfPost(recognizer: UIGestureRecognizer) {
         
+        defer {
+            self.delegate?.hideBlockView()
+        }
+        
         delegate?.showBlockView()
         
         getUser(userID: cellPost.author) {
@@ -194,13 +198,15 @@ extension FeedTableViewCell {
             }
             
             self.delegate?.tapAuthorOfPost(user: user)
-            
-            self.delegate?.hideBlockView()
         }
     }
     
     /// Тап по количеству лайков поста.
     @IBAction func tapLikesCountLabel(recognizer: UIGestureRecognizer) {
+        
+        defer {
+            self.delegate?.hideBlockView()
+        }
         
         delegate?.showBlockView()
         
@@ -213,10 +219,7 @@ extension FeedTableViewCell {
                 return
             }
             
-            // Передача массива пользователей для дальнейшего перехода на экран лайкнувших пост пользователей
-            self.delegate?.tapLikesCountLabel(userList: userList)
-            
-            self.delegate?.hideBlockView()
+            self.delegate?.tapLikesCountLabel(userList: userList)            
         }
     }
     

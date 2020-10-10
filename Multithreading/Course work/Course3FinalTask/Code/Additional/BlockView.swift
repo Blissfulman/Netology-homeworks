@@ -11,7 +11,7 @@ import UIKit
 
 /// Блокирующее вью с индикатором активности.
 class BlockView: UIView {
-
+    
     private var parentView = UIView()
     
     private let activityIndicator = UIActivityIndicatorView()
@@ -24,7 +24,7 @@ class BlockView: UIView {
     
     func setup() {
         
-        // Настройка самого вью
+        // Установка самого вью
         backgroundColor = .black
         alpha = 0.7
         isHidden = true
@@ -39,7 +39,7 @@ class BlockView: UIView {
         ]
         NSLayoutConstraint.activate(constraints)
         
-        // Настройка индикатора активности
+        // Установка индикатора активности
         activityIndicator.style = .white
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         addSubview(activityIndicator)
@@ -53,7 +53,7 @@ class BlockView: UIView {
         isHidden = false
     }
     
-    func hide () {
+    func hide() {
         isHidden = true
         activityIndicator.stopAnimating()
     }

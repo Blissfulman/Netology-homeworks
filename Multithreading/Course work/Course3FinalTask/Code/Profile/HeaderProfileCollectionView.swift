@@ -19,6 +19,8 @@ protocol HeaderProfileCollectionViewDelegate: UIViewController {
 class HeaderProfileCollectionView: UICollectionReusableView {
     
     // MARK: - Свойства
+    static let identifier = "headerProfile"
+    
     weak var delegate: HeaderProfileCollectionViewDelegate?
     
     @IBOutlet weak var avatarImage: UIImageView!
@@ -26,6 +28,11 @@ class HeaderProfileCollectionView: UICollectionReusableView {
     @IBOutlet weak var followersLabel: UILabel!
     @IBOutlet weak var followingLabel: UILabel!
     @IBOutlet weak var followButton: UIButton!
+    
+    // MARK: - Методы класса
+    static func nib() -> UINib {
+        return UINib(nibName: "HeaderProfileCollectionView", bundle: nil)
+    }
     
     // MARK: - Методы жизненного цикла
     override func awakeFromNib() {
@@ -38,26 +45,25 @@ class HeaderProfileCollectionView: UICollectionReusableView {
     
     // MARK: - Настройка элементов ячейки
     func configure(user: User, isCurrentUser: Bool) {
+        
+        // Если это не профиль текущего пользователя, то устанавливается кнопка подписки/отписки
+        if !isCurrentUser {
+            setupFollowButton(user: user)
+            followButton.isHidden = false
+        }
+        
         avatarImage.image = user.avatar
         avatarImage.layer.cornerRadius = CGFloat(avatarImage.bounds.width / 2)
         fullNameLabel.text = user.fullName
         followersLabel.text = "Followers: " + String(user.followedByCount)
         followingLabel.text = "Following: " + String(user.followsCount)
-        
-        // Если это не профиль текущего пользователя, то устанавливается кнопка подписки/отписки
-        if !isCurrentUser {
-            setupFollowButton(user: user)
-        }
     }
     
     private func setupFollowButton(user: User) {
     
-        if user.currentUserFollowsThisUser {
-            followButton.setTitle("Unfollow", for: .normal)
-        } else {
+        user.currentUserFollowsThisUser ?
+            followButton.setTitle("Unfollow", for: .normal) :
             followButton.setTitle("Follow", for: .normal)
-        }
-        followButton.isHidden = false
     }
     
     // MARK: - Распознователи жестов
