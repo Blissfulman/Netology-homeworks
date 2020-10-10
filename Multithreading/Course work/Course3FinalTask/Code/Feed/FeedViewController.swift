@@ -30,7 +30,24 @@ class FeedViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        getFeedPosts(isAfterLikeUnlike: false)
+        
+        blockView.show()
+        
+        getFeedPosts { (feedPosts) in
+            
+            guard let feedPosts = feedPosts else {
+                let alert = ErrorAlertController(parentVC: self)
+                alert.show()
+                self.blockView.hide()
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.feedPosts = feedPosts
+                self.feedTableView.reloadData()
+                self.blockView.hide()
+            }
+        }
     }
 }
 
@@ -66,9 +83,19 @@ extension FeedViewController: FeedTableViewCellDelegate {
         navigationController?.pushViewController(likesCV, animated: true)
     }
     
-    /// Обновление данных массива постов ленты.
+    /// Обновление данных массива постов ленты (вызывается после лайка / анлайка).
     func updateFeedData() {
-        getFeedPosts(isAfterLikeUnlike: true)
+        
+        getFeedPosts { (feedPosts) in
+            
+            guard let feedPosts = feedPosts else {
+                let alert = ErrorAlertController(parentVC: self)
+                alert.show()
+                return
+            }
+            
+            self.feedPosts = feedPosts
+        }
     }
     
     func showBlockView() {
@@ -87,34 +114,13 @@ extension FeedViewController: FeedTableViewCellDelegate {
 
 // MARK: - Методы получения данных
 extension FeedViewController {
+    
     /// Получение публикаций пользователей, на которых подписан текущий пользователь.
-    private func getFeedPosts(isAfterLikeUnlike: Bool) {
-        
-        // Блокирующее вью запустится если функция вызвана не после лайка/анлайка
-        if !isAfterLikeUnlike {
-            blockView.show()
-        }
-        
-        DataProviders.shared.postsDataProvider.feed(queue: .global(qos: .userInitiated)) { (feedPosts) in
+    private func getFeedPosts(completion: @escaping ([Post]?) -> Void) {
+        DataProviders.shared.postsDataProvider.feed(queue: .global(qos: .userInitiated)) {
+            (feedPosts) in
             
-            guard let feedPosts = feedPosts else {
-                let alert = ErrorAlertController(parentVC: self)
-                alert.show()
-                self.blockView.hide()
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self.feedPosts = feedPosts
-                
-                // Если обновление массива постов вызвано после лайков, то reloadData не вызывается
-                if !isAfterLikeUnlike {
-                    self.feedTableView.reloadData()
-                    self.blockView.hide()
-                } else {
-                    //                    print("Feed updated!")
-                }
-            }
+            completion(feedPosts)
         }
     }
 }

@@ -27,18 +27,10 @@ class FeedTableViewCell: UITableViewCell {
     private var cellPost: Post!
     
     /// Логическое значение, указывающее, лайкнул ли текущий пользователь данный пост.
-    private var isLiked = false {
-        didSet {
-            likeImage.tintColor = isLiked ? .systemBlue : .lightGray
-        }
-    }
+    private var isLiked = false
     
     /// Количество лайков на этой публикации.
-    private var likedByCount = 0 {
-        didSet {
-            likesCountLabel.text = "Likes: " + String(likedByCount)
-        }
-    }
+    private var likedByCount = 0
         
     @IBOutlet weak var avatarImage: UIImageView!
     @IBOutlet weak var authorUsernameLabel: UILabel!
@@ -69,7 +61,7 @@ class FeedTableViewCell: UITableViewCell {
         authorUsernameLabel.text = post.authorUsername
         createdTimeLabel.text = setDateAndTime(post.createdTime)
         postImage.image = post.image
-//        updateLikeData()
+        updateLikeData()
         descriptionLabel.text = post.description
     }
     
@@ -81,10 +73,10 @@ class FeedTableViewCell: UITableViewCell {
         return dateFormat.string(from: date as Date)
     }
     
-//    private func updateLikeData() {
-//        likeImage.tintColor = isLiked ? .systemBlue : .lightGray
-//        likesCountLabel.text = "Likes: " + String(likedByCount)
-//    }
+    private func updateLikeData() {
+        likeImage.tintColor = isLiked ? .systemBlue : .lightGray
+        likesCountLabel.text = "Likes: " + String(likedByCount)
+    }
     
     // MARK: - Обработка лайков
     /// Лайк, либо отмена лайка поста.
@@ -102,7 +94,7 @@ class FeedTableViewCell: UITableViewCell {
         }
         
         // Обновление данных о лайках поста в ячейке (количество и цвет сердечка)
-//        updateLikeData()
+        updateLikeData()
         
         // Получение обновлённого поста
         getPost(postID: self.cellPost.id) {
@@ -183,10 +175,6 @@ extension FeedTableViewCell {
     /// Тап по автору поста.
     @IBAction func tapAuthorOfPost(recognizer: UIGestureRecognizer) {
         
-        defer {
-            self.delegate?.hideBlockView()
-        }
-        
         delegate?.showBlockView()
         
         getUser(userID: cellPost.author) {
@@ -194,19 +182,17 @@ extension FeedTableViewCell {
             
             guard let user = user else {
                 self.delegate?.showErrorAlert()
+                self.delegate?.hideBlockView()
                 return
             }
             
             self.delegate?.tapAuthorOfPost(user: user)
+            self.delegate?.hideBlockView()
         }
     }
     
     /// Тап по количеству лайков поста.
     @IBAction func tapLikesCountLabel(recognizer: UIGestureRecognizer) {
-        
-        defer {
-            self.delegate?.hideBlockView()
-        }
         
         delegate?.showBlockView()
         
@@ -216,10 +202,12 @@ extension FeedTableViewCell {
             
             guard let userList = userList else {
                 self.delegate?.showErrorAlert()
+                self.delegate?.hideBlockView()
                 return
             }
             
-            self.delegate?.tapLikesCountLabel(userList: userList)            
+            self.delegate?.tapLikesCountLabel(userList: userList)
+            self.delegate?.hideBlockView()
         }
     }
     
