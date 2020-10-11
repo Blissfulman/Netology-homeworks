@@ -33,7 +33,9 @@ class FeedViewController: UIViewController {
         
         blockView.show()
         
-        getFeedPosts { (feedPosts) in
+        getFeedPosts { [weak self] (feedPosts) in
+            
+            guard let `self` = self else { return }
             
             guard let feedPosts = feedPosts else {
                 let alert = ErrorAlertController(parentVC: self)
@@ -86,7 +88,9 @@ extension FeedViewController: FeedTableViewCellDelegate {
     /// Обновление данных массива постов ленты (вызывается после лайка / анлайка).
     func updateFeedData() {
         
-        getFeedPosts { (feedPosts) in
+        getFeedPosts { [weak self] (feedPosts) in
+            
+            guard let `self` = self else { return }
             
             guard let feedPosts = feedPosts else {
                 let alert = ErrorAlertController(parentVC: self)
@@ -95,6 +99,7 @@ extension FeedViewController: FeedTableViewCellDelegate {
             }
             
             self.feedPosts = feedPosts
+            print("Liked!")
         }
     }
     

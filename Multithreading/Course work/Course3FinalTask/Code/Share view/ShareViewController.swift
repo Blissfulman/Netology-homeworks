@@ -51,7 +51,9 @@ class ShareViewController: UIViewController {
         DataProviders.shared.postsDataProvider
             .newPost(with: transmittedImage,
                      description: description,
-                     queue: .main) { _ in
+                     queue: .main) { [weak self] _ in
+                        
+                        guard let `self` = self else { return }
                         
                         // Получение корневого вью элемента таб бара "Feed"
                         guard let navControllerFeed = self.tabBarController?.viewControllers?[0] as? UINavigationController else { return }

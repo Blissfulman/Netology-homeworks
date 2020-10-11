@@ -53,7 +53,9 @@ class ProfileViewController: UIViewController {
             
             self.semaphore.wait()
 
-            self.getCurrentUser { (currentUser) in
+            self.getCurrentUser { [weak self] (currentUser) in
+                
+                guard let `self` = self else { return }
                 
                 guard let currentUser = currentUser else {
                     let alert = ErrorAlertController(parentVC: self)
@@ -85,7 +87,9 @@ class ProfileViewController: UIViewController {
             self.semaphore.wait()
             
             // Обновление данных о пользователе
-            self.getUser { (user) in
+            self.getUser { [weak self] (user) in
+                
+                guard let `self` = self else { return }
                                 
                 guard let user = user else {
                     let alert = ErrorAlertController(parentVC: self)
@@ -151,7 +155,9 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
         guard let user = user else { return }
         
         getUsersFollowingUser(with: user.id) {
-            (userList) in
+            [weak self] (userList) in
+            
+            guard let `self` = self else { return }
             
             guard let userList = userList else {
                 let alert = ErrorAlertController(parentVC: self)
@@ -170,7 +176,9 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
         guard let user = user else { return }
         
         getUsersFollowedByUser(with: user.id) {
-            (userList) in
+            [weak self] (userList) in
+            
+            guard let `self` = self else { return }
             
             guard let userList = userList else {
                 let alert = ErrorAlertController(parentVC: self)
@@ -198,7 +206,9 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
         }
         
         // Обновление данных об отображаемом пользователе
-        getUser { (updatedUser) in
+        getUser { [weak self] (updatedUser) in
+            
+            guard let `self` = self else { return }
             
             guard let updatedUser = updatedUser else {
                 let alert = ErrorAlertController(parentVC: self)
@@ -229,8 +239,10 @@ extension ProfileViewController {
     private func getPhotos(user: User) {
                 
         DataProviders.shared.postsDataProvider.findPosts(by: user.id, queue: .global(qos: .userInteractive)) {
-            (userPosts) in
-                        
+            [weak self] (userPosts) in
+            
+            guard let `self` = self else { return }
+            
             DispatchQueue.main.async {
                 
                 defer {
@@ -257,8 +269,10 @@ extension ProfileViewController {
         blockView.show()
         
         DataProviders.shared.usersDataProvider.usersFollowedByUser(with: userID, queue: .global(qos: .userInteractive)) {
-            (usersFollowedByUser) in
-                        
+            [weak self] (usersFollowedByUser) in
+            
+            guard let `self` = self else { return }
+            
             DispatchQueue.main.async {
                 completion(usersFollowedByUser)
                 self.blockView.hide()
@@ -272,7 +286,9 @@ extension ProfileViewController {
         blockView.show()
         
         DataProviders.shared.usersDataProvider.usersFollowingUser(with: userID, queue: .global(qos: .userInteractive)) {
-            (usersFollowingUser) in
+            [weak self] (usersFollowingUser) in
+            
+            guard let `self` = self else { return }
                         
             DispatchQueue.main.async {
                 completion(usersFollowingUser)

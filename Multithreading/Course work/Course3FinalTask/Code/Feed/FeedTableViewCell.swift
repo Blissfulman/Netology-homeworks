@@ -98,7 +98,9 @@ class FeedTableViewCell: UITableViewCell {
         
         // Получение обновлённого поста
         getPost(postID: self.cellPost.id) {
-            (updatedPost) in
+            [weak self] (updatedPost) in
+            
+            guard let `self` = self else { return }
             
             guard let updatedPost = updatedPost else {
                 self.delegate?.showErrorAlert()
@@ -158,7 +160,7 @@ extension FeedTableViewCell {
     @IBAction func tapPostImage(recognizer: UITapGestureRecognizer) {
         
         // Проверка отсутствия у поста лайка текущего пользователя
-        guard !cellPost.currentUserLikesThisPost else { return }
+        guard !isLiked else { return }
         
         // Анимация большого сердца
         let likeAnimation = CAKeyframeAnimation(keyPath: "opacity")
@@ -178,7 +180,9 @@ extension FeedTableViewCell {
         delegate?.showBlockView()
         
         getUser(userID: cellPost.author) {
-            (user) in
+            [weak self] (user) in
+            
+            guard let `self` = self else { return }
             
             guard let user = user else {
                 self.delegate?.showErrorAlert()
@@ -198,7 +202,9 @@ extension FeedTableViewCell {
         
         // Создание массива пользователей, лайкнувших пост
         getUsersLikedPost(postID: cellPost.id) {
-            (userList) in
+            [weak self] (userList) in
+            
+            guard let `self` = self else { return }
             
             guard let userList = userList else {
                 self.delegate?.showErrorAlert()

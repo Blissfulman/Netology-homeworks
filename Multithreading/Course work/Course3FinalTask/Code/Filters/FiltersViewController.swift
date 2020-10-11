@@ -98,8 +98,12 @@ class FiltersViewController: UIViewController {
             let filterOperation = FilterImageOperation(inputImage: thumbnailImage,
                                                        filter: filters[item])
             filterOperation.completionBlock = {
-                DispatchQueue.main.async {
+                DispatchQueue.main.async { [weak self] in
+                    
+                    guard let `self` = self else { return }
+                    
                     guard let outputImage = filterOperation.outputImage else { return }
+                    
                     self.filteredThumbnails[item] = outputImage
                     self.filtersCollectionView.reloadItems(at: [.init(item: item, section: 0)])
                 }
@@ -139,8 +143,12 @@ extension FiltersViewController: UICollectionViewDataSource, UICollectionViewDel
         let filterOperation = FilterImageOperation(inputImage: originalBigImage,
                                                    filter: filters[indexPath.item])
         filterOperation.completionBlock = {
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                
+                guard let `self` = self else { return }
+                
                 guard let outputImage = filterOperation.outputImage else { return }
+                
                 self.bigImage.image = outputImage
                 self.blockView.hide()
             }

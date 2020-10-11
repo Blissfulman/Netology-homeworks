@@ -124,7 +124,7 @@
 				74B79257202B3254006BCB41 /* AppDelegate.swift */,
 				CECB0BFA24C86E870086A593 /* Main.storyboard */,
 				CED3279724DEE22900BB1A80 /* Feed */,
-				CEBE92AA25264B72002A6A63 /* New Post */,
+				CEBE92AA25264B72002A6A63 /* New post */,
 				CEBE92B32529A9D7002A6A63 /* Filters */,
 				CEA36F40252F785000386D64 /* Share view */,
 				CED3279824DEE23C00BB1A80 /* Profile */,
@@ -178,14 +178,14 @@
 			path = "Share view";
 			sourceTree = "<group>";
 		};
-		CEBE92AA25264B72002A6A63 /* New Post */ = {
+		CEBE92AA25264B72002A6A63 /* New post */ = {
 			isa = PBXGroup;
 			children = (
 				CEBE92AB25264BF6002A6A63 /* NewPostViewController.swift */,
 				CEBE92B12528C588002A6A63 /* NewPostCollectionViewCell.swift */,
 				CEBE92AF2528C4CC002A6A63 /* NewPostCollectionViewCell.xib */,
 			);
-			path = "New Post";
+			path = "New post";
 			sourceTree = "<group>";
 		};
 		CEBE92B32529A9D7002A6A63 /* Filters */ = {

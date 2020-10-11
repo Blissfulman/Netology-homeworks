@@ -112,7 +112,7 @@ extension NewPostViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - Методы получения данных
 extension NewPostViewController {
     
-    /// Получение текущего пользователя.
+    /// Получение изображений для использования в новых публикациях.
     func getNewPhotos() {
         newPhotos = DataProviders.shared.photoProvider.photos()
         thumbnailsOfPhotos = DataProviders.shared.photoProvider.thumbnailPhotos()
