@@ -99,7 +99,6 @@ extension FeedViewController: FeedTableViewCellDelegate {
             }
             
             self.feedPosts = feedPosts
-            print("Liked!")
         }
     }
     
