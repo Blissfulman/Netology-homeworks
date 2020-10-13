@@ -12,7 +12,13 @@ import DataProvider
 
 class ProfileViewController: UIViewController {
     
-    // MARK: - Свойства
+    // MARK: - IB Outlets
+    /// Коллекция, отображающая информацию о пользователе.
+    @IBOutlet weak var profileCollectionView: UICollectionView!
+    
+    // MARK: - Properties
+    static let identifier = "ProfileViewController"
+    
     /// Пользователь, данные которого отображает вью.
     var user: User?
         
@@ -29,15 +35,12 @@ class ProfileViewController: UIViewController {
     private let numberOfColumnsOfPhotos: CGFloat = 3
     
     /// Очередь для выстраивания запросов данных у провайдера.
-    private let queue = DispatchQueue(label: "Queue",
+    private let getDataQueue = DispatchQueue(label: "getDataQueue",
                                       qos: .userInteractive)
     /// Семафор для установки порядка запросов к провайдеру.
     private let semaphore = DispatchSemaphore(value: 1)
     
-    /// Коллекция, отображающая информацию о пользователе.
-    @IBOutlet weak var profileCollectionView: UICollectionView!
-    
-    // MARK: - Методы жизненного цикла
+    // MARK: - Lifeсycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -48,15 +51,16 @@ class ProfileViewController: UIViewController {
                                        withReuseIdentifier: HeaderProfileCollectionView.identifier)
 
         profileCollectionView.dataSource = self
-                
-        queue.async {
+        
+        // Получение данных о текущем пользователе должно произойти до получения данных об открываемом профиле (которое происходит в методе viewWillAppear)
+        getDataQueue.async { [weak self] in
             
+            guard let `self` = self else { return }
+
             self.semaphore.wait()
 
-            self.getCurrentUser { [weak self] (currentUser) in
-                
-                guard let `self` = self else { return }
-                
+            self.getCurrentUser { (currentUser) in
+                                
                 guard let currentUser = currentUser else {
                     let alert = ErrorAlertController(parentVC: self)
                     alert.show()
@@ -82,15 +86,16 @@ class ProfileViewController: UIViewController {
         
         blockView.show()
         
-        queue.async {
+        // Получение данных об открываемом пользователе
+        getDataQueue.async { [weak self] in
             
+            guard let `self` = self else { return }
+
             self.semaphore.wait()
             
             // Обновление данных о пользователе
-            self.getUser { [weak self] (user) in
-                
-                guard let `self` = self else { return }
-                                
+            self.getUser { (user) in
+                                                
                 guard let user = user else {
                     let alert = ErrorAlertController(parentVC: self)
                     alert.show()
@@ -116,7 +121,7 @@ extension ProfileViewController: UICollectionViewDataSource {
         
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            let header = profileCollectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerProfile", for: indexPath) as! HeaderProfileCollectionView
+            let header = profileCollectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderProfileCollectionView.identifier, for: indexPath) as! HeaderProfileCollectionView
             header.delegate = self
             if let user = user, let isCurrentUser = isCurrentUser {
                 header.configure(user: user, isCurrentUser: isCurrentUser)
@@ -131,7 +136,8 @@ extension ProfileViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = profileCollectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! ProfileCollectionViewCell
+        let cell = profileCollectionView.dequeueReusableCell(withReuseIdentifier: ProfileCollectionViewCell.identifier,
+                                                             for: indexPath) as! ProfileCollectionViewCell
         cell.configure(photosOfUser[indexPath.item])
         return cell
     }
@@ -149,7 +155,7 @@ extension ProfileViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - HeaderProfileCollectionViewDelegate
 extension ProfileViewController: HeaderProfileCollectionViewDelegate {
     
-    // MARK: - Навигация
+    // MARK: - Navigation
     func tapFollowersLabel() {
         
         guard let user = user else { return }
@@ -192,7 +198,7 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
         }
     }
     
-    // MARK: - Обработка подписки/отписки
+    // MARK: - Working with followings
     /// Подписка, либо отписка от пользователя.
     func followUnfollowUser() {
         
@@ -222,7 +228,7 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
     }
 }
 
-// MARK: - Методы получения данных
+// MARK: - Data recieving methods
 extension ProfileViewController {
     
     /// Получение текущего пользователя.

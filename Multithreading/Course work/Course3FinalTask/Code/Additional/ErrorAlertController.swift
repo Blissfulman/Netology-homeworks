@@ -10,7 +10,7 @@ import UIKit
 
 class ErrorAlertController: UIAlertController {
     
-    var parentVC: UIViewController!
+    private var parentVC: UIViewController!
     
     convenience init(parentVC: UIViewController) {
         self.init(title: "Unknown error!",

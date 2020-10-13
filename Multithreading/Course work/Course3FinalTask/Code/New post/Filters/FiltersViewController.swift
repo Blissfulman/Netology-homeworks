@@ -9,8 +9,12 @@
 import UIKit
 
 class FiltersViewController: UIViewController {
+    
+    // MARK: - IB Outlets
+    /// Коллекция выбора фильтров с примерами их применения для обработки большого изображения.
+    @IBOutlet weak var filtersCollectionView: UICollectionView!
 
-    // MARK: - Свойства
+    // MARK: - Properties
     /// Блокирующее вью, отображаемое во время ожидания получения данных.
     private lazy var blockView = BlockView(parentView: self.tabBarController?.view ?? self.view)
 
@@ -40,10 +44,7 @@ class FiltersViewController: UIViewController {
     private let minimumLineSpacing: CGFloat = 16
     private let minimumInteritemSpacing: CGFloat = 0
     
-    /// Коллекция выбора фильтров с примерами их применения для обработки большого изображения.
-    @IBOutlet weak var filtersCollectionView: UICollectionView!
-    
-    // MARK: - Инициализаторы
+    // MARK: - Initializers
     convenience init(selectedImage: UIImage, thumbnail: UIImage) {
         self.init()
         bigImage.image = selectedImage
@@ -53,18 +54,18 @@ class FiltersViewController: UIViewController {
                                    count: filters.count)
     }
     
-    // MARK: - Методы жизненного цикла
+    // MARK: - Lifeсycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        title = "Filters"
         setupUI()
         setupLayout()
 
         filtersCollectionView.dataSource = self
         filtersCollectionView.delegate = self
-        filtersCollectionView.register(UINib(nibName: "FiltersCollectionViewCell",
-                                             bundle: nil),
-                                       forCellWithReuseIdentifier: "filterCell")
+        filtersCollectionView.register(FiltersCollectionViewCell.nib(),
+                                       forCellWithReuseIdentifier: FiltersCollectionViewCell.identifier)
         filteringThumbnailImages()
     }
     
@@ -79,7 +80,7 @@ class FiltersViewController: UIViewController {
         view.addSubview(bigImage)
     }
     
-    // MARK: - Layout
+    // MARK: - Setup layout
     private func setupLayout() {
         let constraints = [
             bigImage.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -90,17 +91,19 @@ class FiltersViewController: UIViewController {
         NSLayoutConstraint.activate(constraints)
     }
     
-    // MARK: - Применение фильтров к миниатюрам
+    // MARK: - Applying filters to thumbnails
     func filteringThumbnailImages() {
         
         let queue = OperationQueue()
+        
         for item in 0..<filters.count {
             let filterOperation = FilterImageOperation(inputImage: thumbnailImage,
                                                        filter: filters[item])
-            filterOperation.completionBlock = {
-                DispatchQueue.main.async { [weak self] in
-                    
-                    guard let `self` = self else { return }
+            filterOperation.completionBlock = { [weak self] in
+                
+                guard let `self` = self else { return }
+                
+                DispatchQueue.main.async {
                     
                     guard let outputImage = filterOperation.outputImage else { return }
                     
@@ -128,7 +131,7 @@ extension FiltersViewController: UICollectionViewDataSource, UICollectionViewDel
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = filtersCollectionView.dequeueReusableCell(withReuseIdentifier: "filterCell", for: indexPath) as! FiltersCollectionViewCell
+        let cell = filtersCollectionView.dequeueReusableCell(withReuseIdentifier: FiltersCollectionViewCell.identifier, for: indexPath) as! FiltersCollectionViewCell
         cell.configure(photo: filteredThumbnails[indexPath.item],
                        filterName: filters[indexPath.item])
         return cell
@@ -137,15 +140,17 @@ extension FiltersViewController: UICollectionViewDataSource, UICollectionViewDel
     // MARK: - CollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        // Применение выбранного фильтра к большому изображению
         blockView.show()
+        
+        // Применение выбранного фильтра к большому изображению
         let queue = OperationQueue()
         let filterOperation = FilterImageOperation(inputImage: originalBigImage,
                                                    filter: filters[indexPath.item])
-        filterOperation.completionBlock = {
-            DispatchQueue.main.async { [weak self] in
-                
-                guard let `self` = self else { return }
+        filterOperation.completionBlock = { [weak self] in
+            
+            guard let `self` = self else { return }
+            
+            DispatchQueue.main.async {
                 
                 guard let outputImage = filterOperation.outputImage else { return }
                 

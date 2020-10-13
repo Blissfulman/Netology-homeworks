@@ -38,7 +38,7 @@ class FilterImageOperation: Operation {
         guard let cgImage = context.createCGImage(filteredImage,
                                                   from: filteredImage.extent) else { return }
         
-        // Создание UIImage
+        // Создание итогового UIImage
         outputImage = UIImage(cgImage: cgImage)
     }
 }

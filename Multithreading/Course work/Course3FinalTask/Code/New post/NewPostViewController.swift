@@ -12,10 +12,10 @@ import DataProvider
 
 class NewPostViewController: UIViewController {
     
-    // MARK: - Свойства
+    // MARK: - Properties
     /// Блокирующее вью, отображаемое во время ожидания получения данных.
     private lazy var blockView = BlockView(parentView: self.tabBarController?.view ?? self.view)
-    
+        
     /// Количество колонок в представлении фотографий.
     private let numberOfColumnsOfPhotos: CGFloat = 3
     
@@ -27,28 +27,29 @@ class NewPostViewController: UIViewController {
     
     /// Коллекция изображений для использования в новых публикациях.
     private lazy var photosForNewPostCollectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: CGRect.zero,
-                                              collectionViewLayout: UICollectionViewFlowLayout())
+        let layout = UICollectionViewFlowLayout()
+        let numberOfColumns: CGFloat = 3
+        let size = self.view.bounds.width / numberOfColumns
+        layout.itemSize = CGSize(width: size, height: size)
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 0
+        let collectionView = UICollectionView(frame: .zero,
+                                              collectionViewLayout: layout)
         collectionView.backgroundColor = .white
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.register(NewPostCollectionViewCell.nib(),
+                                forCellWithReuseIdentifier: NewPostCollectionViewCell.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
     
-    // Константы размеров элементов коллекции изображений.
-    private let minimumLineSpacing: CGFloat = 0
-    private let minimumInteritemSpacing: CGFloat = 0
-    
-    // MARK: - Методы жизненного цикла
+    // MARK: - Lifeсycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(photosForNewPostCollectionView)
+        setupUI()
         setupLayout()
-        photosForNewPostCollectionView.register(UINib(nibName: "NewPostCollectionViewCell",
-                                                      bundle: nil),
-                                                forCellWithReuseIdentifier: "newPhotoCell")
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -58,7 +59,12 @@ class NewPostViewController: UIViewController {
         blockView.hide()
     }
     
-    // MARK: - Layout
+    // MARK: - Setup UI
+    private func setupUI() {
+        view.addSubview(photosForNewPostCollectionView)
+    }
+    
+    // MARK: - Setup layout
     private func setupLayout() {
         let constraints = [
             photosForNewPostCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -78,7 +84,7 @@ extension NewPostViewController: UICollectionViewDataSource, UICollectionViewDel
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = photosForNewPostCollectionView.dequeueReusableCell(withReuseIdentifier: "newPhotoCell", for: indexPath) as! NewPostCollectionViewCell
+        let cell = photosForNewPostCollectionView.dequeueReusableCell(withReuseIdentifier: NewPostCollectionViewCell.identifier, for: indexPath) as! NewPostCollectionViewCell
         cell.configure(newPhotos[indexPath.item])
         return cell
     }
@@ -87,7 +93,6 @@ extension NewPostViewController: UICollectionViewDataSource, UICollectionViewDel
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let filtersVC = FiltersViewController(selectedImage: newPhotos[indexPath.item],
                                               thumbnail: thumbnailsOfPhotos[indexPath.item])
-        filtersVC.title = "Filters"
         navigationController?.pushViewController(filtersVC, animated: true)
     }
 }
@@ -99,17 +104,9 @@ extension NewPostViewController: UICollectionViewDelegateFlowLayout {
         let size = photosForNewPostCollectionView.bounds.width / numberOfColumnsOfPhotos
         return CGSize(width: size, height: size)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return minimumLineSpacing
-    }
-
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return minimumInteritemSpacing
-    }
 }
 
-// MARK: - Методы получения данных
+// MARK: - Data recieving methods
 extension NewPostViewController {
     
     /// Получение изображений для использования в новых публикациях.

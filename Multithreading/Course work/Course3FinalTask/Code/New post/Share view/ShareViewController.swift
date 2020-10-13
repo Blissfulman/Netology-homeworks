@@ -11,20 +11,21 @@ import DataProvider
 
 class ShareViewController: UIViewController {
     
-    // MARK: - Свойства
-    /// Переданное изображение для публикации.
-    private lazy var transmittedImage = UIImage()
-    
+    // MARK: - IB Outlets
     @IBOutlet weak var shareImage: UIImageView!
     @IBOutlet weak var descriptionTextField: UITextField!
     
-    // MARK: - Инициализаторы
+    // MARK: - Properties
+    /// Переданное изображение для публикации.
+    private lazy var transmittedImage = UIImage()
+    
+    // MARK: - Initializers
     convenience init(transmittedImage: UIImage) {
         self.init()
         self.transmittedImage = transmittedImage
     }
     
-    // MARK: - Методы жизненного цикла
+    // MARK: - Lifeсycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         

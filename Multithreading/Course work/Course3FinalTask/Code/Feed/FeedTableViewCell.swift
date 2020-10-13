@@ -9,7 +9,7 @@
 import UIKit
 import DataProvider
 
-protocol FeedTableViewCellDelegate: AnyObject {
+protocol FeedTableViewCellDelegate: UIViewController {
     func tapAuthorOfPost(user: User)
     func tapLikesCountLabel(userList: [User])
     func updateFeedData()
@@ -20,7 +20,19 @@ protocol FeedTableViewCellDelegate: AnyObject {
 
 class FeedTableViewCell: UITableViewCell {
 
-    // MARK: - Свойства
+    // MARK: - IB Outlets
+    @IBOutlet weak var avatarImage: UIImageView!
+    @IBOutlet weak var authorUsernameLabel: UILabel!
+    @IBOutlet weak var createdTimeLabel: UILabel!
+    @IBOutlet weak var postImage: UIImageView!
+    @IBOutlet weak var bigLikeImage: UIImageView!
+    @IBOutlet weak var likesCountLabel: UILabel!
+    @IBOutlet weak var likeImage: UIImageView!
+    @IBOutlet weak var descriptionLabel: UILabel!
+    
+    // MARK: - Properties
+    static let identifier = "feedPostCell"
+    
     weak var delegate: FeedTableViewCellDelegate?
     
     /// Пост ячейки
@@ -31,25 +43,16 @@ class FeedTableViewCell: UITableViewCell {
     
     /// Количество лайков на этой публикации.
     private var likedByCount = 0
-        
-    @IBOutlet weak var avatarImage: UIImageView!
-    @IBOutlet weak var authorUsernameLabel: UILabel!
-    @IBOutlet weak var createdTimeLabel: UILabel!
-    @IBOutlet weak var postImage: UIImageView!
-    @IBOutlet weak var bigLikeImage: UIImageView!
-    @IBOutlet weak var likesCountLabel: UILabel!
-    @IBOutlet weak var likeImage: UIImageView!
-    @IBOutlet weak var descriptionLabel: UILabel!
     
-    // MARK: - Методы жизненного цикла
+    // MARK: - Lifeсycle methods
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        setGestureRecognizers()
+        setupGestureRecognizers()
     }
     
-    // MARK: - Настройка элементов ячейки
-    func fillingCell(_ post: Post) {
+    // MARK: - Setup the cell
+    func configure(_ post: Post) {
                 
         // Запись переменных поста
         isLiked = post.currentUserLikesThisPost
@@ -78,7 +81,7 @@ class FeedTableViewCell: UITableViewCell {
         likesCountLabel.text = "Likes: " + String(likedByCount)
     }
     
-    // MARK: - Обработка лайков
+    // MARK: - Working with likes
     /// Лайк, либо отмена лайка поста.
     private func likeUnlikePost() {
 
@@ -120,8 +123,8 @@ class FeedTableViewCell: UITableViewCell {
 
 extension FeedTableViewCell {
     
-    // MARK: - Установка распознователей жестов
-    private func setGestureRecognizers() {
+    // MARK: - Setup gesture recognizers
+    private func setupGestureRecognizers() {
         
         // Жест двойного тапа по картинке поста
         let postImageGR = UITapGestureRecognizer(target: self,
@@ -223,7 +226,7 @@ extension FeedTableViewCell {
     }
 }
 
-// MARK: - Методы получения данных
+// MARK: - Data recieving methods
 extension FeedTableViewCell {
     
     /// Получение публикации с переданным ID.

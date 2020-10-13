@@ -12,16 +12,17 @@ import DataProvider
 
 class FeedViewController: UIViewController {
     
-    // MARK: - Свойства
+    // MARK: - IB Outlets
+    @IBOutlet weak var feedTableView: UITableView!
+    
+    // MARK: - Properties
     /// Блокирующее вью, отображаемое во время ожидания получения данных.
     private lazy var blockView = BlockView(parentView: self.tabBarController?.view ?? self.view)
     
     /// Массив постов ленты.
     private var feedPosts = [Post]()
     
-    @IBOutlet weak var feedTableView: UITableView!
-        
-    // MARK: - Методы жизненного цикла
+    // MARK: - Lifeсycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
                 
@@ -61,8 +62,9 @@ extension FeedViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "postCell", for: indexPath) as! FeedTableViewCell
-        cell.fillingCell(feedPosts[indexPath.row])
+        let cell = tableView.dequeueReusableCell(withIdentifier: FeedTableViewCell.identifier,
+                                                 for: indexPath) as! FeedTableViewCell
+        cell.configure(feedPosts[indexPath.row])
         cell.delegate = self
         return cell
     }
@@ -73,16 +75,16 @@ extension FeedViewController: FeedTableViewCellDelegate {
     
     /// Переход в профиль автора поста.
     func tapAuthorOfPost(user: User) {
-        guard let profileVC = storyboard?.instantiateViewController(withIdentifier: "ProfileViewController") as? ProfileViewController else { return }
+        guard let profileVC = storyboard?.instantiateViewController(withIdentifier: ProfileViewController.identifier) as? ProfileViewController else { return }
         profileVC.user = user
         navigationController?.pushViewController(profileVC, animated: true)
     }
     
     /// Переход на экран лайкнувших пост пользователей.
     func tapLikesCountLabel(userList: [User]) {
-        let likesCV = UserListViewController(userList: userList)
-        likesCV.title = "Likes"
-        navigationController?.pushViewController(likesCV, animated: true)
+        let likesVC = UserListViewController(userList: userList)
+        likesVC.title = "Likes"
+        navigationController?.pushViewController(likesVC, animated: true)
     }
     
     /// Обновление данных массива постов ленты (вызывается после лайка / анлайка).
@@ -116,7 +118,7 @@ extension FeedViewController: FeedTableViewCellDelegate {
     }
 }
 
-// MARK: - Методы получения данных
+// MARK: - Data recieving methods
 extension FeedViewController {
     
     /// Получение публикаций пользователей, на которых подписан текущий пользователь.

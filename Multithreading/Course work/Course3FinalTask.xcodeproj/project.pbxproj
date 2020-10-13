@@ -125,10 +125,7 @@
 				CECB0BFA24C86E870086A593 /* Main.storyboard */,
 				CED3279724DEE22900BB1A80 /* Feed */,
 				CEBE92AA25264B72002A6A63 /* New post */,
-				CEBE92B32529A9D7002A6A63 /* Filters */,
-				CEA36F40252F785000386D64 /* Share view */,
 				CED3279824DEE23C00BB1A80 /* Profile */,
-				CE6D676824DFB67A002FE7F2 /* User list */,
 				CEA36F3D252E25E300386D64 /* Additional */,
 			);
 			path = Code;
@@ -151,17 +148,10 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		CE6D676824DFB67A002FE7F2 /* User list */ = {
-			isa = PBXGroup;
-			children = (
-				CE6D676D24E02574002FE7F2 /* UserListViewController.swift */,
-			);
-			path = "User list";
-			sourceTree = "<group>";
-		};
 		CEA36F3D252E25E300386D64 /* Additional */ = {
 			isa = PBXGroup;
 			children = (
+				CE6D676D24E02574002FE7F2 /* UserListViewController.swift */,
 				CEB1669C251FAF9700DF6F98 /* BlockView.swift */,
 				CEA36F3E252E264000386D64 /* FilterImageOperation.swift */,
 				CE13E3152530E20700AF848D /* ErrorAlertController.swift */,
@@ -184,6 +174,8 @@
 				CEBE92AB25264BF6002A6A63 /* NewPostViewController.swift */,
 				CEBE92B12528C588002A6A63 /* NewPostCollectionViewCell.swift */,
 				CEBE92AF2528C4CC002A6A63 /* NewPostCollectionViewCell.xib */,
+				CEBE92B32529A9D7002A6A63 /* Filters */,
+				CEA36F40252F785000386D64 /* Share view */,
 			);
 			path = "New post";
 			sourceTree = "<group>";

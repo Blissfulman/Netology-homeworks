@@ -13,6 +13,14 @@ class NewPostCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet weak var photoImage: UIImageView!
     
+    static let identifier = "newPhotoCell"
+    
+    weak var delegate: HeaderProfileCollectionViewDelegate?
+    
+    static func nib() -> UINib {
+        return UINib(nibName: "NewPostCollectionViewCell", bundle: nil)
+    }
+    
     func configure(_ photo: UIImage) {
         photoImage.image = photo
     }

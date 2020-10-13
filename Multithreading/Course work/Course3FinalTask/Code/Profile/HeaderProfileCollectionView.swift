@@ -18,32 +18,32 @@ protocol HeaderProfileCollectionViewDelegate: UIViewController {
 
 class HeaderProfileCollectionView: UICollectionReusableView {
     
-    // MARK: - Свойства
-    static let identifier = "headerProfile"
-    
-    weak var delegate: HeaderProfileCollectionViewDelegate?
-    
+    // MARK: - IB Outlets
     @IBOutlet weak var avatarImage: UIImageView!
     @IBOutlet weak var fullNameLabel: UILabel!
     @IBOutlet weak var followersLabel: UILabel!
     @IBOutlet weak var followingLabel: UILabel!
     @IBOutlet weak var followButton: UIButton!
     
-    // MARK: - Методы класса
+    // MARK: - Properties
+    static let identifier = "headerProfile"
+    
+    weak var delegate: HeaderProfileCollectionViewDelegate?
+    
+    // MARK: - Class methods
     static func nib() -> UINib {
         return UINib(nibName: "HeaderProfileCollectionView", bundle: nil)
     }
     
-    // MARK: - Методы жизненного цикла
+    // MARK: - Lifeсycle methods
     override func awakeFromNib() {
         super.awakeFromNib()
         
         followButton.layer.cornerRadius = 5
-        setGestureRecognizers()
-        followButton.sizeToFit()
+        setupGestureRecognizers()
     }
     
-    // MARK: - Настройка элементов ячейки
+    // MARK: - Setup the cell
     func configure(user: User, isCurrentUser: Bool) {
         
         // Если это не профиль текущего пользователя, то устанавливается кнопка подписки/отписки
@@ -66,8 +66,8 @@ class HeaderProfileCollectionView: UICollectionReusableView {
             followButton.setTitle("Follow", for: .normal)
     }
     
-    // MARK: - Распознователи жестов
-    private func setGestureRecognizers() {
+    // MARK: - Setup gesture recognizers
+    private func setupGestureRecognizers() {
         
         // Жест тапа по подписчикам
         let followersGR = UITapGestureRecognizer(target: self, action: #selector(tapFollowersLabel(recognizer:)))

@@ -10,11 +10,17 @@ import UIKit
 
 class FiltersCollectionViewCell: UICollectionViewCell {
 
-    @IBOutlet weak var exampleImage: UIImageView!
+    @IBOutlet weak var thumbnailImageView: UIImageView!
     @IBOutlet weak var filterNameLabel: UILabel!
     
+    static let identifier = "filtersPhotoCell"
+    
+    static func nib() -> UINib {
+        return UINib(nibName: "FiltersCollectionViewCell", bundle: nil)
+    }
+    
     func configure(photo: UIImage, filterName: String) {
-        exampleImage.image = photo
+        thumbnailImageView.image = photo
         filterNameLabel.text = filterName
     }
 

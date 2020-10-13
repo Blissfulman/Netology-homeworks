@@ -11,7 +11,7 @@ import DataProvider
 
 class UserListViewController: UIViewController {
     
-    // MARK: - Свойства
+    // MARK: - Properties    
     /// Список пользователей для отображения в таблице.
     private var userList: [User] = []
     
@@ -27,18 +27,18 @@ class UserListViewController: UIViewController {
     /// Высота строки в таблице.
     private let heightForRow: CGFloat = 45
     
-    // MARK: - Инициализаторы
+    // MARK: - Initializers
     convenience init(userList: [User]) {
         self.init()
         self.userList = userList
     }
     
-    // MARK: - Методы жизненного цикла
+    // MARK: - Lifeсycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI()
-        setupConstraints()
+        setupLayout()
     }
     
     // Снятие выделения с ячейки при возврате на вью
@@ -52,8 +52,8 @@ class UserListViewController: UIViewController {
         view.addSubview(userListTableView)
     }
     
-    // MARK: - Layout
-    private func setupConstraints() {
+    // MARK: - Setup layout
+    private func setupLayout() {
         let constraints = [
             userListTableView.topAnchor.constraint(equalTo: view.topAnchor),
             userListTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -85,8 +85,8 @@ extension UserListViewController: UITableViewDataSource, UITableViewDelegate {
     
     // Переход на вью пользователя
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        guard let profileVC = storyboard.instantiateViewController(withIdentifier: "ProfileViewController") as? ProfileViewController else { return }
+        let storyboard = UIStoryboard(name: AppDelegate.storyboardName, bundle: nil)
+        guard let profileVC = storyboard.instantiateViewController(withIdentifier: ProfileViewController.identifier) as? ProfileViewController else { return }
         profileVC.user = userList[indexPath.row]
         navigationController?.pushViewController(profileVC, animated: true)
     }

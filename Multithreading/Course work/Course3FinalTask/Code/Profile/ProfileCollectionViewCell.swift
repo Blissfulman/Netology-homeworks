@@ -11,9 +11,9 @@ import UIKit
 
 class ProfileCollectionViewCell: UICollectionViewCell {
     
-    static let identifier = "photoCell"
-    
     @IBOutlet weak var photoImage: UIImageView!
+    
+    static let identifier = "photoCell"
     
     static func nib() -> UINib {
         return UINib(nibName: "ProfileCollectionViewCell", bundle: nil)
