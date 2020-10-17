@@ -33,14 +33,14 @@ class FeedViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         
         blockView.show()
-        
+
         getFeedPosts { [weak self] (feedPosts) in
             
             guard let `self` = self else { return }
             
             guard let feedPosts = feedPosts else {
-                let alert = ErrorAlertController(parentVC: self)
-                alert.show()
+                self.showAlert(title: "Unknown error!",
+                               message: "Please, try again later")
                 self.blockView.hide()
                 return
             }
@@ -95,8 +95,8 @@ extension FeedViewController: FeedTableViewCellDelegate {
             guard let `self` = self else { return }
             
             guard let feedPosts = feedPosts else {
-                let alert = ErrorAlertController(parentVC: self)
-                alert.show()
+                self.showAlert(title: "Unknown error!",
+                               message: "Please, try again later")
                 return
             }
             
@@ -113,8 +113,8 @@ extension FeedViewController: FeedTableViewCellDelegate {
     }
     
     func showErrorAlert() {
-        let alert = ErrorAlertController(parentVC: self)
-        alert.show()
+        showAlert(title: "Unknown error!",
+                  message: "Please, try again later")
     }
 }
 

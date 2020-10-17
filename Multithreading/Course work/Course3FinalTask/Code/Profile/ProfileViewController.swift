@@ -36,7 +36,7 @@ class ProfileViewController: UIViewController {
     
     /// Очередь для выстраивания запросов данных у провайдера.
     private let getDataQueue = DispatchQueue(label: "getDataQueue",
-                                      qos: .userInteractive)
+                                             qos: .userInteractive)
     /// Семафор для установки порядка запросов к провайдеру.
     private let semaphore = DispatchSemaphore(value: 1)
     
@@ -62,8 +62,8 @@ class ProfileViewController: UIViewController {
             self.getCurrentUser { (currentUser) in
                                 
                 guard let currentUser = currentUser else {
-                    let alert = ErrorAlertController(parentVC: self)
-                    alert.show()
+                    self.showAlert(title: "Unknown error!",
+                                   message: "Please, try again later")
                     self.semaphore.signal()
                     return
                 }
@@ -97,8 +97,8 @@ class ProfileViewController: UIViewController {
             self.getUser { (user) in
                                                 
                 guard let user = user else {
-                    let alert = ErrorAlertController(parentVC: self)
-                    alert.show()
+                    self.showAlert(title: "Unknown error!",
+                                   message: "Please, try again later")
                     self.semaphore.signal()
                     return
                 }
@@ -166,8 +166,8 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
             guard let `self` = self else { return }
             
             guard let userList = userList else {
-                let alert = ErrorAlertController(parentVC: self)
-                alert.show()
+                self.showAlert(title: "Unknown error!",
+                               message: "Please, try again later")
                 return
             }
             
@@ -187,8 +187,8 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
             guard let `self` = self else { return }
             
             guard let userList = userList else {
-                let alert = ErrorAlertController(parentVC: self)
-                alert.show()
+                self.showAlert(title: "Unknown error!",
+                               message: "Please, try again later")
                 return
             }
             
@@ -217,8 +217,8 @@ extension ProfileViewController: HeaderProfileCollectionViewDelegate {
             guard let `self` = self else { return }
             
             guard let updatedUser = updatedUser else {
-                let alert = ErrorAlertController(parentVC: self)
-                alert.show()
+                self.showAlert(title: "Unknown error!",
+                               message: "Please, try again later")
                 return
             }
             
@@ -256,8 +256,8 @@ extension ProfileViewController {
                 }
 
                 guard let userPosts = userPosts else {
-                    let alert = ErrorAlertController(parentVC: self)
-                    alert.show()
+                    self.showAlert(title: "Unknown error!",
+                                   message: "Please, try again later")
                     return
                 }
                 
