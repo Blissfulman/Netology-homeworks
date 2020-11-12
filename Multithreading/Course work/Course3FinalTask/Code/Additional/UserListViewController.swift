@@ -85,8 +85,11 @@ extension UserListViewController: UITableViewDataSource, UITableViewDelegate {
     
     // Переход на вью пользователя
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         let storyboard = UIStoryboard(name: AppDelegate.storyboardName, bundle: nil)
+        
         guard let profileVC = storyboard.instantiateViewController(withIdentifier: ProfileViewController.identifier) as? ProfileViewController else { return }
+        
         profileVC.user = userList[indexPath.row]
         navigationController?.pushViewController(profileVC, animated: true)
     }

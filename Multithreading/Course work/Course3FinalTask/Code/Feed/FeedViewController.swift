@@ -54,7 +54,7 @@ class FeedViewController: UIViewController {
     }
 }
 
-// MARK: - CollectionViewDataSource
+// MARK: - TableViewDataSource
 extension FeedViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -76,6 +76,7 @@ extension FeedViewController: FeedTableViewCellDelegate {
     /// Переход в профиль автора поста.
     func tapAuthorOfPost(user: User) {
         guard let profileVC = storyboard?.instantiateViewController(withIdentifier: ProfileViewController.identifier) as? ProfileViewController else { return }
+        
         profileVC.user = user
         navigationController?.pushViewController(profileVC, animated: true)
     }
@@ -83,6 +84,7 @@ extension FeedViewController: FeedTableViewCellDelegate {
     /// Переход на экран лайкнувших пост пользователей.
     func tapLikesCountLabel(userList: [User]) {
         let likesVC = UserListViewController(userList: userList)
+        
         likesVC.title = "Likes"
         navigationController?.pushViewController(likesVC, animated: true)
     }
